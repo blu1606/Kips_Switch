@@ -69,6 +69,12 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
             // Get vault PDA
             const [vaultPda] = getVaultPDA(publicKey);
 
+            // Check if vault already exists
+            const accountInfo = await connection.getAccountInfo(vaultPda);
+            if (accountInfo) {
+                throw new Error('You already have a vault! This demo supports only one vault per wallet. Please switch wallets to create a new one.');
+            }
+
             // Create the instruction manually since we don't have IDL loaded
             // For now, we'll use a simplified approach
             const recipientPubkey = new PublicKey(formData.recipientAddress);

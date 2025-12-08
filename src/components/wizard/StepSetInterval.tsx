@@ -12,6 +12,12 @@ interface Props {
 
 const INTERVAL_OPTIONS = [
     {
+        label: '30 Seconds (Testing)',
+        value: 30,
+        description: 'For testing purposes only',
+        recommended: false
+    },
+    {
         label: '30 Days',
         value: 30 * 24 * 60 * 60,
         description: 'Check in once a month',

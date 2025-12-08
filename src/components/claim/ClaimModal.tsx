@@ -14,21 +14,26 @@ interface ClaimModalProps {
 export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProps) {
     const { signMessage } = useWallet();
     const [password, setPassword] = useState('');
-    const [status, setStatus] = useState<'idle' | 'fetching' | 'decrypting' | 'downloading' | 'error'>('idle');
+    const [status, setStatus] = useState<'idle' | 'fetching' | 'decrypting' | 'viewing' | 'error'>('idle');
     const [error, setError] = useState<string | null>(null);
 
+    // Decrypted Content State
+    const [decryptedText, setDecryptedText] = useState<string | null>(null);
+    const [mediaUrl, setMediaUrl] = useState<string | null>(null);
+    const [fileType, setFileType] = useState<string>('');
+    const [fileName, setFileName] = useState<string>('');
+    const [downloadBlob, setDownloadBlob] = useState<Blob | null>(null);
+
     const handleClaim = async () => {
-        if (!password) {
-            setError('Please enter the vault password');
-            return;
-        }
+        if (!password) { setError('Please enter password'); return; }
 
         setStatus('fetching');
         setError(null);
+        setDecryptedText(null);
+        setMediaUrl(null);
 
         try {
             // 1. Fetch from IPFS
-            console.log('Fetching from IPFS:', vault.ipfsCid);
             const encryptedBlob = await fetchFromIPFS(vault.ipfsCid);
 
             setStatus('decrypting');
@@ -37,34 +42,36 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
             const packageText = await encryptedBlob.text();
             const pkg = JSON.parse(packageText);
 
-            // Support for version 2 (Password Protected)
             if (pkg.version === 2 && pkg.keyWrapper) {
                 const wrapper: WrappedKeyData = pkg.keyWrapper;
 
-                // 3. Unwrap Key with Password
-                console.log('Unwrapping key with password...');
+                // 3. Unwrap Key
                 const vaultKey = await unwrapKeyWithPassword(wrapper, password);
 
                 // 4. Decrypt File
-                console.log('Decrypting file...');
                 const encryptedFile: EncryptedData = pkg.encryptedFile;
-                const decryptedBlob = await unwrapKeyWithPassword(wrapper, password).then(key =>
-                    // We need a decryptFile function that takes EncryptedData and CryptoKey
-                    // Wait, decryptVaultPackage handles imported key, we need lower level
-                    import('@/utils/crypto').then(m => m.decryptFile(encryptedFile, key))
-                );
+                const decryptedBlob = await import('@/utils/crypto').then(m => m.decryptFile(encryptedFile, vaultKey));
 
-                triggerDownload(decryptedBlob, pkg.metadata.fileName);
-            } else {
-                throw new Error('This vault uses an old format or is missing password protection.');
-            }
+                // Set state for viewing
+                setFileType(pkg.metadata.fileType);
+                setFileName(pkg.metadata.fileName);
+                setDownloadBlob(decryptedBlob);
 
-            setStatus('downloading');
-            setTimeout(() => {
+                // Handle display based on type
+                if (pkg.metadata.fileType.startsWith('text/')) {
+                    const text = await decryptedBlob.text();
+                    setDecryptedText(text);
+                } else {
+                    const url = URL.createObjectURL(decryptedBlob);
+                    setMediaUrl(url);
+                }
+
+                setStatus('viewing');
                 onSuccess();
-                onClose();
-            }, 2000);
 
+            } else {
+                throw new Error('Unsupported vault format.');
+            }
         } catch (err: any) {
             console.error('Claim failed:', err);
             setStatus('error');
@@ -72,17 +79,65 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
         }
     };
 
-    const triggerDownload = (blob: Blob, filename: string) => {
-        const url = URL.createObjectURL(blob);
+    const downloadFile = () => {
+        if (!downloadBlob) return;
+        const url = URL.createObjectURL(downloadBlob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = filename;
+        a.download = fileName;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     };
 
+    const closeViewer = () => {
+        if (mediaUrl) URL.revokeObjectURL(mediaUrl);
+        setMediaUrl(null);
+        setDecryptedText(null);
+        setDownloadBlob(null);
+        setStatus('idle');
+        onClose();
+    };
+
+    // RENDER CONTENT VIEWER
+    if (status === 'viewing') {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+                <div className="bg-dark-800 rounded-xl max-w-2xl w-full p-6 border border-dark-700 shadow-2xl flex flex-col max-h-[90vh]">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-bold text-white">🔓 Secret Revealed: {fileName}</h2>
+                        <button onClick={closeViewer} className="text-dark-400 hover:text-white">✕</button>
+                    </div>
+
+                    <div className="flex-1 overflow-auto bg-dark-900 rounded-lg p-4 mb-4 border border-dark-600 min-h-[200px]">
+                        {decryptedText !== null ? (
+                            <pre className="whitespace-pre-wrap text-white font-mono text-sm">{decryptedText}</pre>
+                        ) : mediaUrl ? (
+                            fileType.startsWith('image/') ? (
+                                <img src={mediaUrl} alt="Decrypted" className="max-w-full mx-auto" />
+                            ) : fileType.startsWith('video/') ? (
+                                <video src={mediaUrl} controls className="w-full" />
+                            ) : fileType.startsWith('audio/') ? (
+                                <audio src={mediaUrl} controls className="w-full mt-10" />
+                            ) : (
+                                <div className="text-center py-10 text-dark-400">
+                                    Cannot preview this file type. Please download to view.
+                                </div>
+                            )
+                        ) : null}
+                    </div>
+
+                    <div className="flex gap-3 mt-auto">
+                        <button onClick={closeViewer} className="btn-secondary flex-1">Close</button>
+                        <button onClick={downloadFile} className="btn-primary flex-1">⬇️ Download File</button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // RENDER PASSWORD INPUT
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
             <div className="bg-dark-800 rounded-xl max-w-md w-full p-6 border border-dark-700 shadow-2xl">
@@ -90,7 +145,7 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
 
                 <div className="mb-6">
                     <p className="text-dark-400 text-sm mb-4">
-                        This vault is encrypted. Please enter the password provided by the owner to unlock it.
+                        Enter the vault password to unlock and view the contents immediately.
                     </p>
 
                     <label className="block text-xs font-medium text-dark-300 mb-1">Vault Password</label>
@@ -124,7 +179,7 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
                         disabled={status !== 'idle' && status !== 'error'}
                         className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {status === 'idle' || status === 'error' ? '🔓 Unlock & Download' : (
+                        {status === 'idle' || status === 'error' ? '🔓 Unlock & View' : (
                             <span className="flex items-center justify-center gap-2">
                                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                 {status === 'fetching' ? 'Downloading...' : 'Decrypting...'}
