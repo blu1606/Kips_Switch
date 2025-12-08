@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { Program, AnchorProvider, Wallet } from '@coral-xyz/anchor';
 import { PROGRAM_ID } from '@/utils/anchor';
+import { getSupabaseAdmin } from '@/utils/supabase';
 
 // Vault status classification
 interface VaultStatus {
@@ -33,7 +34,6 @@ export async function GET(request: NextRequest) {
 
         const now = Math.floor(Date.now() / 1000);
         const vaultStatuses: VaultStatus[] = [];
-
         const expiredVaults: VaultStatus[] = [];
         const warningVaults: { vault: VaultStatus; urgency: string }[] = [];
 
@@ -100,23 +100,71 @@ export async function GET(request: NextRequest) {
         console.log(`[Cron] Checked ${vaultStatuses.length} vaults`);
         console.log(`[Cron] Expired: ${expiredVaults.length}, Warnings: ${warningVaults.length}`);
 
+        // Initialize Supabase for contact lookup
+        const supabase = getSupabaseAdmin();
+
+        // Helper to get contacts for a list of vaults
+        const getVaultContacts = async (addresses: string[]) => {
+            if (!supabase || addresses.length === 0) return {};
+
+            const { data } = await supabase
+                .from('vault_contacts')
+                .select('vault_address, owner_email, recipient_email')
+                .in('vault_address', addresses);
+
+            if (!data) return {};
+
+            // Map vault_address -> contacts
+            return data.reduce((acc: Record<string, { ownerEmail: string | null; recipientEmail: string | null }>, curr: any) => {
+                acc[curr.vault_address] = {
+                    ownerEmail: curr.owner_email,
+                    recipientEmail: curr.recipient_email
+                };
+                return acc;
+            }, {} as Record<string, { ownerEmail: string | null; recipientEmail: string | null }>);
+        };
+
+        // Collect all addresses that need notifications
+        const allAddresses = [
+            ...expiredVaults.map(v => v.address),
+            ...warningVaults.map(v => v.vault.address)
+        ];
+
+        const contactsMap = await getVaultContacts(allAddresses);
+        const { sendOwnerReminder, sendRecipientNotification } = await import('@/utils/email');
+
         // Send emails for expired vaults (notify recipients)
         const emailResults = { ownerReminders: 0, recipientNotifications: 0 };
 
         // For expired vaults, notify recipients
         for (const vault of expiredVaults) {
             console.log(`[Cron] EXPIRED: ${vault.address} (Owner: ${vault.owner})`);
-            // Note: We need recipient email stored somewhere - for now just log
-            // In production, you'd look up email from a database
-            // await sendRecipientNotification(recipientEmail, vault.address, vault.owner);
+
+            const contacts = contactsMap[vault.address];
+            if (contacts?.recipientEmail) {
+                const sent = await sendRecipientNotification(
+                    contacts.recipientEmail,
+                    vault.address,
+                    vault.owner
+                );
+                if (sent) emailResults.recipientNotifications++;
+            }
         }
 
         // For warning vaults, notify owners
         for (const { vault, urgency } of warningVaults) {
             console.log(`[Cron] ${urgency.toUpperCase()}: ${vault.address} expires in ${vault.daysUntilExpiry.toFixed(1)} days`);
-            // Note: We need owner email stored somewhere - for now just log
-            // In production, you'd look up email from a database
-            // await sendOwnerReminder(ownerEmail, vault.address, vault.daysUntilExpiry, urgency as any);
+
+            const contacts = contactsMap[vault.address];
+            if (contacts?.ownerEmail) {
+                const sent = await sendOwnerReminder(
+                    contacts.ownerEmail,
+                    vault.address,
+                    vault.daysUntilExpiry,
+                    urgency as any
+                );
+                if (sent) emailResults.ownerReminders++;
+            }
         }
 
         return NextResponse.json({
@@ -127,6 +175,7 @@ export async function GET(request: NextRequest) {
                 expiredCount: expiredVaults.length,
                 warningCount: warningVaults.length,
             },
+            emailResults,
             expired: expiredVaults.map(v => ({
                 address: v.address,
                 owner: v.owner,
