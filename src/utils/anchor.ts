@@ -44,7 +44,7 @@ export const getTimeUntilExpiry = (lastCheckIn: bigint, timeInterval: bigint): n
     const now = BigInt(Math.floor(Date.now() / 1000));
     const expiry = lastCheckIn + timeInterval;
     const remaining = expiry - now;
-    return remaining > 0n ? Number(remaining) : 0;
+    return remaining > BigInt(0) ? Number(remaining) : 0;
 };
 
 // Helper to check if vault is expired

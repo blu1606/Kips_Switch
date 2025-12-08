@@ -3,8 +3,7 @@
 import { FC, useState, useCallback, useRef } from 'react';
 import { VaultFormData } from '@/app/create/page';
 import {
-    generateAESKey,
-    createEncryptedVaultPackage
+    createPasswordProtectedVaultPackage
 } from '@/utils/crypto';
 
 interface Props {
@@ -19,6 +18,9 @@ type ContentType = 'file' | 'text' | 'voice' | 'video';
 
 const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext }) => {
     const [activeTab, setActiveTab] = useState<ContentType>('file');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
     const [isDragging, setIsDragging] = useState(false);
     const [isEncrypting, setIsEncrypting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -44,17 +46,33 @@ const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext }) => {
     const streamRef = useRef<MediaStream | null>(null);
 
     const encryptContent = useCallback(async (file: File) => {
+        if (!password) {
+            setError('Please enter a password for your vault.');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setError('Passwords do not match.');
+            return;
+        }
+
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters.');
+            return;
+        }
+
         setIsEncrypting(true);
         setError(null);
 
         try {
-            const key = await generateAESKey();
-            const { blob, keyBase64 } = await createEncryptedVaultPackage(file, key);
+            // Create password protected package
+            const { blob } = await createPasswordProtectedVaultPackage(file, password);
 
             updateFormData({
                 file,
                 encryptedBlob: blob,
-                aesKeyBase64: keyBase64,
+                // We no longer need to store raw key
+                aesKeyBase64: 'password-protected',
             });
 
             setEncryptionComplete(true);
@@ -64,25 +82,22 @@ const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext }) => {
         } finally {
             setIsEncrypting(false);
         }
-    }, [updateFormData]);
+    }, [password, confirmPassword, updateFormData]);
 
     // File handling
     const handleFile = useCallback(async (file: File) => {
         setError(null);
-
         if (file.size > MAX_FILE_SIZE) {
             setError('File too large. Maximum size is 50MB.');
             return;
         }
-
         updateFormData({ file });
-        await encryptContent(file);
-    }, [encryptContent, updateFormData]);
+        // Don't encrypt immediately, waiting for password
+    }, [updateFormData]);
 
     const handleDrop = useCallback((e: React.DragEvent) => {
         e.preventDefault();
         setIsDragging(false);
-
         const file = e.dataTransfer.files[0];
         if (file) handleFile(file);
     }, [handleFile]);
@@ -92,17 +107,30 @@ const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext }) => {
         if (file) handleFile(file);
     }, [handleFile]);
 
-    // Text handling
-    const handleEncryptText = useCallback(async () => {
-        if (!textContent.trim()) {
-            setError('Please enter some text.');
-            return;
+    // Trigger encryption manually
+    const handleEncryptCurrentContent = async () => {
+        let fileToEncrypt: File | null = null;
+
+        if (activeTab === 'file') {
+            fileToEncrypt = formData.file;
+        } else if (activeTab === 'text') {
+            if (!textContent.trim()) { setError('Please enter some text.'); return; }
+            const blob = new Blob([textContent], { type: 'text/plain' });
+            fileToEncrypt = new File([blob], 'secret-message.txt', { type: 'text/plain' });
+        } else if (activeTab === 'voice') {
+            if (!audioBlob) { setError('Please record a message.'); return; }
+            fileToEncrypt = new File([audioBlob], 'voice-message.webm', { type: 'audio/webm' });
+        } else if (activeTab === 'video') {
+            if (!videoBlob) { setError('Please record a video.'); return; }
+            fileToEncrypt = new File([videoBlob], 'video-message.webm', { type: 'video/webm' });
         }
 
-        const blob = new Blob([textContent], { type: 'text/plain' });
-        const file = new File([blob], 'secret-message.txt', { type: 'text/plain' });
-        await encryptContent(file);
-    }, [textContent, encryptContent]);
+        if (fileToEncrypt) {
+            await encryptContent(fileToEncrypt);
+        } else {
+            setError('Please select/create content first.');
+        }
+    };
 
     // Voice recording
     const startVoiceRecording = useCallback(async () => {
@@ -111,25 +139,16 @@ const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext }) => {
             const mediaRecorder = new MediaRecorder(stream);
             mediaRecorderRef.current = mediaRecorder;
             audioChunksRef.current = [];
-
-            mediaRecorder.ondataavailable = (e) => {
-                if (e.data.size > 0) {
-                    audioChunksRef.current.push(e.data);
-                }
-            };
-
+            mediaRecorder.ondataavailable = (e) => audioChunksRef.current.push(e.data);
             mediaRecorder.onstop = () => {
                 const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
                 setAudioBlob(blob);
                 setAudioUrl(URL.createObjectURL(blob));
                 stream.getTracks().forEach(track => track.stop());
             };
-
             mediaRecorder.start();
             setIsRecording(true);
-        } catch (err) {
-            setError('Could not access microphone. Please check permissions.');
-        }
+        } catch { setError('Could not access microphone.'); }
     }, []);
 
     const stopVoiceRecording = useCallback(() => {
@@ -139,52 +158,26 @@ const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext }) => {
         }
     }, [isRecording]);
 
-    const handleEncryptVoice = useCallback(async () => {
-        if (!audioBlob) return;
-
-        const file = new File([audioBlob], 'voice-message.webm', { type: 'audio/webm' });
-        await encryptContent(file);
-    }, [audioBlob, encryptContent]);
-
     // Video recording
     const startVideoRecording = useCallback(async () => {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: true,
-                audio: true
-            });
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             streamRef.current = stream;
-
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream;
-                videoRef.current.play();
-            }
-
+            if (videoRef.current) { videoRef.current.srcObject = stream; videoRef.current.play(); }
             const mediaRecorder = new MediaRecorder(stream);
             videoRecorderRef.current = mediaRecorder;
             videoChunksRef.current = [];
-
-            mediaRecorder.ondataavailable = (e) => {
-                if (e.data.size > 0) {
-                    videoChunksRef.current.push(e.data);
-                }
-            };
-
+            mediaRecorder.ondataavailable = (e) => videoChunksRef.current.push(e.data);
             mediaRecorder.onstop = () => {
                 const blob = new Blob(videoChunksRef.current, { type: 'video/webm' });
                 setVideoBlob(blob);
                 setVideoUrl(URL.createObjectURL(blob));
                 stream.getTracks().forEach(track => track.stop());
-                if (videoRef.current) {
-                    videoRef.current.srcObject = null;
-                }
+                if (videoRef.current) videoRef.current.srcObject = null;
             };
-
             mediaRecorder.start();
             setIsVideoRecording(true);
-        } catch (err) {
-            setError('Could not access camera/microphone. Please check permissions.');
-        }
+        } catch { setError('Could not access camera.'); }
     }, []);
 
     const stopVideoRecording = useCallback(() => {
@@ -194,248 +187,108 @@ const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext }) => {
         }
     }, [isVideoRecording]);
 
-    const handleEncryptVideo = useCallback(async () => {
-        if (!videoBlob) return;
-
-        const file = new File([videoBlob], 'video-message.webm', { type: 'video/webm' });
-        await encryptContent(file);
-    }, [videoBlob, encryptContent]);
-
-    const canProceed = encryptionComplete && formData.encryptedBlob && formData.aesKeyBase64;
+    const canProceed = encryptionComplete && formData.encryptedBlob;
 
     const tabs = [
-        { id: 'file' as ContentType, label: '📁 File', icon: '📁' },
-        { id: 'text' as ContentType, label: '📝 Text', icon: '📝' },
-        { id: 'voice' as ContentType, label: '🎤 Voice', icon: '🎤' },
-        { id: 'video' as ContentType, label: '🎥 Video', icon: '🎥' },
+        { id: 'file' as ContentType, label: '📁 File' },
+        { id: 'text' as ContentType, label: '📝 Text' },
+        { id: 'voice' as ContentType, label: '🎤 Voice' },
+        { id: 'video' as ContentType, label: '🎥 Video' },
     ];
 
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-xl font-semibold mb-2">Upload Your Secret</h2>
+                <h2 className="text-xl font-semibold mb-2">Upload & Protect Secret</h2>
                 <p className="text-dark-400 text-sm">
-                    Choose how you want to store your secret. At least one type is required.
-                    Everything is encrypted in your browser.
+                    Content is encrypted with your password. We cannot recover it if lost.
                 </p>
             </div>
 
             {/* Content Type Tabs */}
-            <div className="flex gap-2 p-1 bg-dark-800 rounded-lg">
-                {tabs.map((tab) => (
-                    <button
-                        key={tab.id}
-                        onClick={() => {
-                            setActiveTab(tab.id);
-                            setEncryptionComplete(false);
-                            setError(null);
-                        }}
-                        className={`
-              flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all
-              ${activeTab === tab.id
-                                ? 'bg-primary-600 text-white'
-                                : 'text-dark-400 hover:text-white hover:bg-dark-700'
-                            }
-            `}
-                    >
-                        {tab.label}
-                    </button>
-                ))}
-            </div>
-
-            {/* File Upload */}
-            {activeTab === 'file' && (
-                <div
-                    onDrop={handleDrop}
-                    onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                    onDragLeave={() => setIsDragging(false)}
-                    className={`
-            border-2 border-dashed rounded-xl p-8 text-center transition-all
-            ${isDragging
-                            ? 'border-primary-500 bg-primary-500/10'
-                            : 'border-dark-600 hover:border-dark-500'
-                        }
-            ${isEncrypting ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-          `}
-                >
-                    {isEncrypting ? (
-                        <div className="space-y-3">
-                            <div className="w-12 h-12 mx-auto border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
-                            <p className="text-primary-400">Encrypting...</p>
-                        </div>
-                    ) : encryptionComplete && formData.file ? (
-                        <div className="space-y-3">
-                            <div className="w-12 h-12 mx-auto bg-green-500/20 rounded-full flex items-center justify-center">
-                                <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            <p className="text-green-400">Encrypted!</p>
-                            <p className="text-dark-400 text-sm">{formData.file.name}</p>
-                        </div>
-                    ) : (
-                        <>
-                            <div className="w-12 h-12 mx-auto bg-dark-700 rounded-full flex items-center justify-center mb-4">
-                                <svg className="w-6 h-6 text-dark-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                </svg>
-                            </div>
-                            <p className="text-dark-300 mb-2">Drag & drop any file here</p>
-                            <p className="text-dark-500 text-sm mb-4">or click to browse (max 50MB)</p>
-                            <input type="file" onChange={handleFileInput} className="hidden" id="file-upload" />
-                            <label htmlFor="file-upload" className="btn-secondary inline-block cursor-pointer">
-                                Choose File
-                            </label>
-                        </>
-                    )}
+            {!encryptionComplete && (
+                <div className="flex gap-2 p-1 bg-dark-800 rounded-lg">
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => {
+                                setActiveTab(tab.id);
+                                setError(null);
+                                setEncryptionComplete(false);
+                            }}
+                            className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-primary-600 text-white' : 'text-dark-400 hover:text-white hover:bg-dark-700'}`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
                 </div>
             )}
 
-            {/* Text Input */}
-            {activeTab === 'text' && (
-                <div className="space-y-4">
-                    {encryptionComplete ? (
-                        <div className="text-center py-8">
-                            <div className="w-12 h-12 mx-auto bg-green-500/20 rounded-full flex items-center justify-center mb-3">
-                                <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            <p className="text-green-400">Text encrypted!</p>
-                        </div>
-                    ) : (
-                        <>
-                            <textarea
-                                value={textContent}
-                                onChange={(e) => setTextContent(e.target.value)}
-                                placeholder="Enter your secret message here..."
-                                className="w-full h-40 bg-dark-900 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder:text-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 resize-none"
-                            />
-                            <button
-                                onClick={handleEncryptText}
-                                disabled={!textContent.trim() || isEncrypting}
-                                className={`btn-primary w-full ${!textContent.trim() || isEncrypting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            >
-                                {isEncrypting ? 'Encrypting...' : '🔐 Encrypt Text'}
-                            </button>
-                        </>
-                    )}
-                </div>
-            )}
-
-            {/* Voice Recording */}
-            {activeTab === 'voice' && (
-                <div className="space-y-4">
-                    {encryptionComplete ? (
-                        <div className="text-center py-8">
-                            <div className="w-12 h-12 mx-auto bg-green-500/20 rounded-full flex items-center justify-center mb-3">
-                                <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            <p className="text-green-400">Voice message encrypted!</p>
-                        </div>
-                    ) : (
-                        <div className="bg-dark-800 rounded-xl p-6 text-center">
-                            {audioUrl ? (
-                                <div className="space-y-4">
-                                    <audio src={audioUrl} controls className="mx-auto" />
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => { setAudioBlob(null); setAudioUrl(null); }}
-                                            className="btn-secondary flex-1"
-                                        >
-                                            Re-record
-                                        </button>
-                                        <button
-                                            onClick={handleEncryptVoice}
-                                            disabled={isEncrypting}
-                                            className="btn-primary flex-1"
-                                        >
-                                            {isEncrypting ? 'Encrypting...' : '🔐 Encrypt'}
-                                        </button>
+            {/* Content Areas - Only show if not complete */}
+            {!encryptionComplete && (
+                <div className="min-h-[200px]">
+                    {activeTab === 'file' && (
+                        <div
+                            onDrop={handleDrop}
+                            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                            onDragLeave={() => setIsDragging(false)}
+                            className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${isDragging ? 'border-primary-500 bg-primary-500/10' : 'border-dark-600 hover:border-dark-500'}`}
+                        >
+                            {formData.file ? (
+                                <div className="space-y-3">
+                                    <div className="w-12 h-12 mx-auto bg-primary-500/20 rounded-full flex items-center justify-center">
+                                        <span className="text-2xl">📄</span>
                                     </div>
+                                    <p className="text-white">{formData.file.name}</p>
+                                    <button onClick={() => updateFormData({ file: null })} className="text-sm text-red-400 hover:underline">Remove</button>
                                 </div>
                             ) : (
                                 <>
-                                    <button
-                                        onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
-                                        className={`w-20 h-20 rounded-full mx-auto flex items-center justify-center transition-all ${isRecording
-                                                ? 'bg-red-500 animate-pulse'
-                                                : 'bg-primary-600 hover:bg-primary-500'
-                                            }`}
-                                    >
-                                        {isRecording ? (
-                                            <div className="w-6 h-6 bg-white rounded" />
-                                        ) : (
-                                            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
-                                                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
-                                            </svg>
-                                        )}
-                                    </button>
-                                    <p className="text-dark-400 mt-4">
-                                        {isRecording ? 'Recording... Click to stop' : 'Click to start recording'}
-                                    </p>
+                                    <p className="text-dark-300 mb-2">Drag & drop content</p>
+                                    <label htmlFor="file-upload" className="btn-secondary inline-block cursor-pointer">Choose File</label>
+                                    <input type="file" onChange={handleFileInput} className="hidden" id="file-upload" />
                                 </>
                             )}
                         </div>
                     )}
-                </div>
-            )}
 
-            {/* Video Recording */}
-            {activeTab === 'video' && (
-                <div className="space-y-4">
-                    {encryptionComplete ? (
-                        <div className="text-center py-8">
-                            <div className="w-12 h-12 mx-auto bg-green-500/20 rounded-full flex items-center justify-center mb-3">
-                                <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            <p className="text-green-400">Video message encrypted!</p>
-                        </div>
-                    ) : (
-                        <div className="bg-dark-800 rounded-xl p-4">
-                            <video
-                                ref={videoRef}
-                                className={`w-full rounded-lg bg-black ${videoUrl || isVideoRecording ? '' : 'hidden'}`}
-                                src={videoUrl || undefined}
-                                controls={!!videoUrl}
-                                muted={isVideoRecording}
-                            />
-                            {!videoUrl && !isVideoRecording && (
-                                <div className="aspect-video bg-dark-900 rounded-lg flex items-center justify-center">
-                                    <p className="text-dark-500">Camera preview will appear here</p>
+                    {activeTab === 'text' && (
+                        <textarea
+                            value={textContent}
+                            onChange={(e) => setTextContent(e.target.value)}
+                            placeholder="Enter secret message..."
+                            className="w-full h-40 bg-dark-900 border border-dark-600 rounded-lg p-4 text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        />
+                    )}
+
+                    {activeTab === 'voice' && (
+                        <div className="bg-dark-800 rounded-xl p-6 text-center">
+                            {audioUrl ? (
+                                <div className="space-y-4">
+                                    <audio src={audioUrl} controls className="mx-auto" />
+                                    <button onClick={() => { setAudioBlob(null); setAudioUrl(null); }} className="btn-secondary">Re-record</button>
                                 </div>
+                            ) : (
+                                <>
+                                    <button onClick={isRecording ? stopVoiceRecording : startVoiceRecording} className={`w-16 h-16 rounded-full mx-auto flex items-center justify-center ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-primary-600'}`}>
+                                        {isRecording ? '⏹' : '🎤'}
+                                    </button>
+                                    <p className="mt-2 text-sm text-dark-400">{isRecording ? 'Recording...' : 'Click to record'}</p>
+                                </>
                             )}
-                            <div className="flex gap-2 mt-4">
+                        </div>
+                    )}
+
+                    {activeTab === 'video' && (
+                        <div className="bg-dark-800 rounded-xl p-4 text-center">
+                            <video ref={videoRef} className={`w-full rounded-lg bg-black ${videoUrl || isVideoRecording ? '' : 'hidden'}`} src={videoUrl || undefined} controls={!!videoUrl} muted={isVideoRecording} />
+                            {!videoUrl && !isVideoRecording && <div className="aspect-video bg-dark-900 rounded-lg flex items-center justify-center text-dark-500">Preview</div>}
+                            <div className="mt-4">
                                 {videoUrl ? (
-                                    <>
-                                        <button
-                                            onClick={() => { setVideoBlob(null); setVideoUrl(null); }}
-                                            className="btn-secondary flex-1"
-                                        >
-                                            Re-record
-                                        </button>
-                                        <button
-                                            onClick={handleEncryptVideo}
-                                            disabled={isEncrypting}
-                                            className="btn-primary flex-1"
-                                        >
-                                            {isEncrypting ? 'Encrypting...' : '🔐 Encrypt'}
-                                        </button>
-                                    </>
+                                    <button onClick={() => { setVideoBlob(null); setVideoUrl(null); }} className="btn-secondary">Re-record</button>
                                 ) : (
-                                    <button
-                                        onClick={isVideoRecording ? stopVideoRecording : startVideoRecording}
-                                        className={`w-full py-3 rounded-lg font-medium transition-all ${isVideoRecording
-                                                ? 'bg-red-500 hover:bg-red-600 text-white'
-                                                : 'btn-primary'
-                                            }`}
-                                    >
-                                        {isVideoRecording ? '⏹ Stop Recording' : '🎥 Start Recording'}
+                                    <button onClick={isVideoRecording ? stopVideoRecording : startVideoRecording} className={`w-full py-2 rounded-lg ${isVideoRecording ? 'bg-red-500' : 'btn-primary'}`}>
+                                        {isVideoRecording ? 'Stop' : 'Start Camera'}
                                     </button>
                                 )}
                             </div>
@@ -444,30 +297,69 @@ const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext }) => {
                 </div>
             )}
 
-            {/* Error message */}
-            {error && (
-                <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 text-red-400 text-sm">
-                    {error}
+            {/* Password Protection Section */}
+            {!encryptionComplete && (
+                <div className="bg-dark-800 p-4 rounded-xl border border-dark-700 space-y-4">
+                    <h3 className="font-medium text-white">🔒 Set Vault Password</h3>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label className="block text-xs text-dark-400 mb-1">Password</label>
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full bg-dark-900 border border-dark-600 rounded px-3 py-2 text-white"
+                                placeholder="********"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs text-dark-400 mb-1">Confirm Password</label>
+                            <input
+                                type="password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                className="w-full bg-dark-900 border border-dark-600 rounded px-3 py-2 text-white"
+                                placeholder="********"
+                            />
+                        </div>
+                    </div>
+                    <p className="text-xs text-yellow-500">
+                        ⚠️ Important: You must share this password with your recipient. We cannot reset it.
+                    </p>
                 </div>
             )}
 
-            {/* Key backup warning */}
-            {encryptionComplete && formData.aesKeyBase64 && (
-                <div className="bg-yellow-500/10 border border-yellow-500/50 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                        <svg className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        <div>
-                            <p className="text-yellow-400 font-medium mb-1">Save Your Decryption Key!</p>
-                            <p className="text-dark-400 text-sm mb-2">
-                                This key is required to decrypt your content. Store it safely.
-                            </p>
-                            <code className="block bg-dark-900 rounded p-2 text-xs text-dark-300 break-all">
-                                {formData.aesKeyBase64}
-                            </code>
-                        </div>
+            {/* Action Buttons */}
+            {!encryptionComplete ? (
+                <button
+                    onClick={handleEncryptCurrentContent}
+                    disabled={isEncrypting}
+                    className="btn-primary w-full py-3 text-lg font-bold shadow-lg shadow-primary-500/20"
+                >
+                    {isEncrypting ? 'Encrypting...' : '🔒 Encrypt & Protect'}
+                </button>
+            ) : (
+                <div className="bg-green-500/10 border border-green-500/50 rounded-lg p-6 text-center animate-fade-in">
+                    <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span className="text-3xl">✓</span>
                     </div>
+                    <h3 className="text-green-400 font-bold text-lg mb-2">Content Protected!</h3>
+                    <p className="text-dark-300 text-sm mb-4">
+                        Your vault is now encrypted with your password.
+                    </p>
+                    <div className="bg-dark-900 rounded p-3 text-left">
+                        <p className="text-xs text-dark-400 mb-1">Password Check:</p>
+                        <p className="font-mono text-sm text-white">
+                            {password.replace(/./g, '•')}
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {/* Error Display */}
+            {error && (
+                <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 text-red-400 text-sm">
+                    {error}
                 </div>
             )}
 
