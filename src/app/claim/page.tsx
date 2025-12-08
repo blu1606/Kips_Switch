@@ -48,7 +48,7 @@ export default function ClaimPage() {
                         <button onClick={refetch} className="btn-secondary">Try Again</button>
                     </div>
                 ) : vaults.length > 0 ? (
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {vaults.map((item) => (
                             <VaultCard
                                 key={item.publicKey.toBase58()}

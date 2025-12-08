@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import VaultSafe from './VaultSafe';
+import VaultSafe from './VaultSafe3D';
 
 interface RevealSequenceProps {
     isDecrypting: boolean;
@@ -88,7 +88,7 @@ export default function RevealSequence({
                         exit={{ opacity: 0, scale: 0.9 }}
                         className="text-center"
                     >
-                        <VaultSafe state="locked" />
+                        <VaultSafe isUnlocking={false} />
                         <p className="mt-4 text-dark-400 text-sm">
                             Enter credentials to unlock this legacy
                         </p>
@@ -104,7 +104,7 @@ export default function RevealSequence({
                         exit={{ opacity: 0 }}
                         className="text-center"
                     >
-                        <VaultSafe state={isDecrypted ? 'open' : 'unlocking'} />
+                        <VaultSafe isUnlocking={revealState === 'unlocking'} />
                         <motion.p
                             className="mt-4 text-primary-400 text-sm font-mono"
                             animate={{ opacity: [1, 0.5, 1] }}

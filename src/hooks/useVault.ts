@@ -18,6 +18,7 @@ export interface VaultData {
     isReleased: boolean;
     vaultSeed: BN;
     bump: number;
+    delegate?: PublicKey | null;
 }
 
 export interface VaultStatus {
@@ -128,6 +129,15 @@ export function useOwnerVaults(): UseOwnerVaultsResult {
                 offset += 8;
 
                 const bump = data[offset];
+                offset += 1;
+
+                const hasDelegate = data[offset] === 1;
+                offset += 1;
+                let delegate: PublicKey | null = null;
+                if (hasDelegate) {
+                    delegate = new PublicKey(data.slice(offset, offset + 32));
+                    offset += 32;
+                }
 
                 return {
                     publicKey: acc.pubkey,
@@ -140,6 +150,7 @@ export function useOwnerVaults(): UseOwnerVaultsResult {
                     isReleased,
                     vaultSeed,
                     bump,
+                    delegate,
                 } as VaultData;
             });
 
@@ -170,7 +181,7 @@ export function useOwnerVaults(): UseOwnerVaultsResult {
             .ping()
             .accounts({
                 vault: vault.publicKey,
-                owner: publicKey,
+                signer: publicKey,
             })
             .rpc();
 

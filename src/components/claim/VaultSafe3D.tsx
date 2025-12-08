@@ -5,10 +5,11 @@ import { useRef, useState, useEffect } from 'react';
 
 interface VaultSafe3DProps {
     isUnlocking?: boolean;
+    label?: string;
     onUnlockComplete?: () => void;
 }
 
-export default function VaultSafe3D({ isUnlocking = false, onUnlockComplete }: VaultSafe3DProps) {
+export default function VaultSafe3D({ isUnlocking = false, label, onUnlockComplete }: VaultSafe3DProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isHovered, setIsHovered] = useState(false);
 
@@ -48,7 +49,7 @@ export default function VaultSafe3D({ isUnlocking = false, onUnlockComplete }: V
     return (
         <div
             ref={containerRef}
-            className="relative w-72 h-72 mx-auto perspective-1000"
+            className="relative w-52 h-52 mx-auto perspective-1000"
             onMouseMove={handleMouseMove}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={handleMouseLeave}
@@ -109,7 +110,7 @@ export default function VaultSafe3D({ isUnlocking = false, onUnlockComplete }: V
                     {/* Central lock mechanism */}
                     <div className="absolute inset-0 flex items-center justify-center">
                         <motion.div
-                            className="relative w-32 h-32 rounded-full border-4 flex items-center justify-center"
+                            className="relative w-24 h-24 rounded-full border-4 flex items-center justify-center"
                             style={{
                                 borderColor: isUnlocking ? 'rgba(16, 185, 129, 0.8)' : 'rgba(99, 102, 241, 0.6)',
                                 background: 'radial-gradient(circle, #1e293b 0%, #0f172a 100%)',
@@ -124,7 +125,7 @@ export default function VaultSafe3D({ isUnlocking = false, onUnlockComplete }: V
                         >
                             {/* Lock icon */}
                             <motion.div
-                                className="text-5xl"
+                                className="text-3xl"
                                 animate={isUnlocking ? { scale: [1, 1.5, 0], opacity: [1, 1, 0] } : {}}
                             >
                                 {isUnlocking ? '🔓' : '🔒'}
@@ -199,7 +200,7 @@ export default function VaultSafe3D({ isUnlocking = false, onUnlockComplete }: V
                 animate={{ opacity: [0.7, 1, 0.7] }}
                 transition={{ duration: 2, repeat: Infinity }}
             >
-                {isUnlocking ? '🔓 Unlocking Vault...' : '🔒 Vault Sealed'}
+                {label || (isUnlocking ? '🔓 Unlocking Vault...' : '🔒 Vault Sealed')}
             </motion.p>
         </div>
     );

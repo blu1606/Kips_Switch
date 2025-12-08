@@ -39,6 +39,24 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans bg-void-black text-signal-white`}>
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "SoftwareApplication",
+                            "name": "Deadman's Switch Protocol",
+                            "applicationCategory": "FinanceApplication",
+                            "operatingSystem": "Web",
+                            "description": "A decentralized dead man's switch on Solana for secure digital inheritance and crypto self-custody backup.",
+                            "offers": {
+                                "@type": "Offer",
+                                "price": "0",
+                                "priceCurrency": "USD"
+                            }
+                        })
+                    }}
+                />
                 <WalletContextProvider>
                     <Header />
                     <div className="pt-16 md:pt-16">
