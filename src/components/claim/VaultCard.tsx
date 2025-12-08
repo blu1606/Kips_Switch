@@ -53,15 +53,13 @@ export default function VaultCard({ vault, onClaim }: { vault: any, onClaim: (va
                 onClick={() => onClaim(vault)}
                 disabled={!isReleased && !isExpired}
                 className={`w-full py-2 rounded-lg font-medium transition-all ${isReleased || isExpired
-                        ? 'btn-primary shadow-lg shadow-primary-500/20'
-                        : 'bg-dark-700 text-dark-500 cursor-not-allowed'
+                    ? 'btn-primary shadow-lg shadow-primary-500/20'
+                    : 'bg-dark-700 text-dark-500 cursor-not-allowed'
                     }`}
             >
-                {isReleased
+                {isReleased || isExpired
                     ? '🔓 Decrypt & Claim'
-                    : isExpired
-                        ? '⚠️ Trigger Release'
-                        : '🔒 Locked'}
+                    : '🔒 Locked - Owner Active'}
             </button>
         </div>
     );

@@ -18,10 +18,16 @@ export const getConnection = (): Connection => {
     return connectionInstance;
 };
 
+import { BN } from '@coral-xyz/anchor';
+
 // Vault PDA helper
-export const getVaultPDA = (owner: PublicKey): [PublicKey, number] => {
+export const getVaultPDA = (owner: PublicKey, seed: BN): [PublicKey, number] => {
     return PublicKey.findProgramAddressSync(
-        [Buffer.from('vault'), owner.toBuffer()],
+        [
+            Buffer.from('vault'),
+            owner.toBuffer(),
+            seed.toArrayLike(Buffer, 'le', 8)
+        ],
         PROGRAM_ID
     );
 };

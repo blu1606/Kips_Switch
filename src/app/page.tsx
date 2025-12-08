@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import WalletButton from '@/components/wallet/WalletButton';
 import { useWallet } from '@solana/wallet-adapter-react';
 
@@ -8,27 +9,8 @@ export default function Home() {
 
     return (
         <main className="min-h-screen">
-            {/* Navigation */}
-            <nav className="fixed top-0 left-0 right-0 z-50 glass">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
-                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                            </div>
-                            <span className="text-xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
-                                Deadman&apos;s Switch
-                            </span>
-                        </div>
-                        <WalletButton />
-                    </div>
-                </div>
-            </nav>
-
             {/* Hero Section */}
-            <section className="pt-32 pb-20 px-4">
+            <section className="pt-16 pb-20 px-4">
                 <div className="max-w-4xl mx-auto text-center">
                     <div className="animate-fade-in">
                         <h1 className="text-5xl sm:text-6xl font-bold mb-6">
@@ -45,69 +27,108 @@ export default function Home() {
                     <div className="flex flex-wrap justify-center gap-4 animate-slide-up">
                         {connected ? (
                             <>
-                                <a href="/create" className="btn-primary text-lg px-8 py-3">
-                                    Create Vault
-                                </a>
-                                <a href="/dashboard" className="btn-secondary text-lg px-8 py-3">
-                                    Dashboard
-                                </a>
+                                <Link href="/create" className="btn-primary text-lg px-8 py-3">
+                                    🔒 Create Vault
+                                </Link>
+                                <Link href="/dashboard" className="btn-secondary text-lg px-8 py-3">
+                                    📊 My Vaults
+                                </Link>
+                                <Link href="/claim" className="btn-secondary text-lg px-8 py-3">
+                                    📥 Claim Legacies
+                                </Link>
                             </>
                         ) : (
-                            <WalletButton />
+                            <div className="flex flex-col items-center gap-4">
+                                <WalletButton />
+                                <p className="text-dark-500 text-sm">Connect wallet to get started</p>
+                            </div>
                         )}
-                        <a href="#how-it-works" className="btn-secondary text-lg px-8 py-3">
-                            Learn More
-                        </a>
                     </div>
                 </div>
             </section>
 
-            {/* Features Grid */}
+            {/* Quick Actions for Connected Users */}
+            {connected && (
+                <section className="py-12 px-4 bg-dark-800/30">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <Link href="/create" className="card hover:border-primary-500/50 transition-all group">
+                                <div className="flex items-start gap-4">
+                                    <div className="w-12 h-12 bg-primary-600/20 rounded-xl flex items-center justify-center">
+                                        <span className="text-2xl">🔐</span>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-lg group-hover:text-primary-400 transition-colors">
+                                            Create a Vault
+                                        </h3>
+                                        <p className="text-dark-400 text-sm">
+                                            Store encrypted secrets for your beneficiary
+                                        </p>
+                                    </div>
+                                </div>
+                            </Link>
+
+                            <Link href="/claim" className="card hover:border-green-500/50 transition-all group">
+                                <div className="flex items-start gap-4">
+                                    <div className="w-12 h-12 bg-green-600/20 rounded-xl flex items-center justify-center">
+                                        <span className="text-2xl">📬</span>
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-lg group-hover:text-green-400 transition-colors">
+                                            Check for Legacies
+                                        </h3>
+                                        <p className="text-dark-400 text-sm">
+                                            See if anyone left you a digital legacy
+                                        </p>
+                                    </div>
+                                </div>
+                            </Link>
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {/* How It Works */}
             <section id="how-it-works" className="py-20 px-4">
                 <div className="max-w-6xl mx-auto">
-                    <h2 className="text-3xl font-bold text-center mb-12">
-                        How It Works
-                    </h2>
+                    <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
 
                     <div className="grid md:grid-cols-3 gap-6">
-                        {/* Step 1 */}
-                        <div className="card hover:border-primary-500/50 transition-all duration-300">
+                        <div className="card hover:border-primary-500/50 transition-all">
                             <div className="w-12 h-12 bg-primary-600/20 rounded-xl flex items-center justify-center mb-4">
                                 <span className="text-2xl font-bold text-primary-400">1</span>
                             </div>
                             <h3 className="text-xl font-semibold mb-2">Create Your Vault</h3>
                             <p className="text-dark-400">
-                                Upload your secret files, set a recipient wallet, and choose your check-in interval.
+                                Upload secrets (files, text, voice, video), set a recipient and check-in interval.
                             </p>
                         </div>
 
-                        {/* Step 2 */}
-                        <div className="card hover:border-primary-500/50 transition-all duration-300">
+                        <div className="card hover:border-primary-500/50 transition-all">
                             <div className="w-12 h-12 bg-primary-600/20 rounded-xl flex items-center justify-center mb-4">
                                 <span className="text-2xl font-bold text-primary-400">2</span>
                             </div>
                             <h3 className="text-xl font-semibold mb-2">Regular Check-ins</h3>
                             <p className="text-dark-400">
-                                Ping your vault regularly to prove you&apos;re still active. Simple one-click confirmation.
+                                Click &quot;Check In&quot; periodically to prove you&apos;re active. One-click, on-chain.
                             </p>
                         </div>
 
-                        {/* Step 3 */}
-                        <div className="card hover:border-primary-500/50 transition-all duration-300">
+                        <div className="card hover:border-primary-500/50 transition-all">
                             <div className="w-12 h-12 bg-primary-600/20 rounded-xl flex items-center justify-center mb-4">
                                 <span className="text-2xl font-bold text-primary-400">3</span>
                             </div>
-                            <h3 className="text-xl font-semibold mb-2">Automatic Release</h3>
+                            <h3 className="text-xl font-semibold mb-2">Auto Release</h3>
                             <p className="text-dark-400">
-                                If you miss check-ins, your recipient can claim and decrypt your vault contents.
+                                Miss a check-in? Your recipient can claim and decrypt your vault with the password.
                             </p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Stats Section */}
-            <section className="py-20 px-4">
+            {/* Stats */}
+            <section className="py-16 px-4">
                 <div className="max-w-4xl mx-auto">
                     <div className="card bg-gradient-to-r from-primary-900/30 to-dark-800/60 border-primary-700/30">
                         <div className="grid grid-cols-3 gap-8 text-center">
@@ -131,7 +152,7 @@ export default function Home() {
             {/* Footer */}
             <footer className="py-8 px-4 border-t border-dark-700/50">
                 <div className="max-w-6xl mx-auto text-center text-dark-500 text-sm">
-                    <p>Built on Solana • Open Source • Phase 1 MVP</p>
+                    <p>Built on Solana • Open Source • Phase 3 Complete</p>
                 </div>
             </footer>
         </main>

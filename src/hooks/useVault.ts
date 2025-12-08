@@ -4,10 +4,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
-import { PROGRAM_ID, getVaultPDA } from '@/utils/anchor';
+import { PROGRAM_ID } from '@/utils/anchor';
 
 // Vault data structure matching on-chain account
 export interface VaultData {
+    publicKey: PublicKey;
     owner: PublicKey;
     recipient: PublicKey;
     ipfsCid: string;
@@ -15,38 +16,38 @@ export interface VaultData {
     timeInterval: BN;
     lastCheckIn: BN;
     isReleased: boolean;
+    vaultSeed: BN;
     bump: number;
 }
 
 export interface VaultStatus {
     isExpired: boolean;
-    timeRemaining: number; // seconds
+    timeRemaining: number;
     percentageRemaining: number;
     nextCheckInDate: Date;
 }
 
-export interface UseVaultResult {
-    vault: VaultData | null;
-    status: VaultStatus | null;
+export interface UseOwnerVaultsResult {
+    vaults: VaultData[];
     loading: boolean;
     error: string | null;
     refetch: () => Promise<void>;
-    ping: () => Promise<string>;
+    ping: (vault: VaultData) => Promise<string>;
+    getStatus: (vault: VaultData) => VaultStatus;
 }
 
-export function useVault(): UseVaultResult {
+export function useOwnerVaults(): UseOwnerVaultsResult {
     const { publicKey, signTransaction, signAllTransactions } = useWallet();
     const { connection } = useConnection();
 
-    const [vault, setVault] = useState<VaultData | null>(null);
-    const [status, setStatus] = useState<VaultStatus | null>(null);
+    const [vaults, setVaults] = useState<VaultData[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const calculateStatus = useCallback((vaultData: VaultData): VaultStatus => {
+    const getStatus = useCallback((vault: VaultData): VaultStatus => {
         const now = Math.floor(Date.now() / 1000);
-        const lastCheckIn = vaultData.lastCheckIn.toNumber();
-        const interval = vaultData.timeInterval.toNumber();
+        const lastCheckIn = vault.lastCheckIn.toNumber();
+        const interval = vault.timeInterval.toNumber();
         const expiryTime = lastCheckIn + interval;
         const timeRemaining = Math.max(0, expiryTime - now);
         const percentageRemaining = interval > 0 ? (timeRemaining / interval) * 100 : 0;
@@ -59,10 +60,9 @@ export function useVault(): UseVaultResult {
         };
     }, []);
 
-    const fetchVault = useCallback(async () => {
+    const fetchVaults = useCallback(async () => {
         if (!publicKey) {
-            setVault(null);
-            setStatus(null);
+            setVaults([]);
             setLoading(false);
             return;
         }
@@ -71,86 +71,75 @@ export function useVault(): UseVaultResult {
         setError(null);
 
         try {
-            const [vaultPda] = getVaultPDA(publicKey);
-            const accountInfo = await connection.getAccountInfo(vaultPda);
+            const accounts = await connection.getProgramAccounts(PROGRAM_ID, {
+                filters: [
+                    {
+                        memcmp: {
+                            offset: 8,
+                            bytes: publicKey.toBase58(),
+                        },
+                    },
+                ],
+            });
 
-            if (!accountInfo) {
-                setVault(null);
-                setStatus(null);
-                setLoading(false);
-                return;
-            }
+            const parsed = accounts.map((acc) => {
+                const data = acc.account.data;
+                let offset = 8;
 
-            // Parse vault data from account buffer
-            // Account structure:
-            // - 8 bytes: discriminator
-            // - 32 bytes: owner
-            // - 32 bytes: recipient
-            // - 4 + len bytes: ipfs_cid (string)
-            // - 4 + len bytes: encrypted_key (string)
-            // - 8 bytes: time_interval
-            // - 8 bytes: last_check_in
-            // - 1 byte: is_released
-            // - 1 byte: bump
+                const owner = new PublicKey(data.slice(offset, offset + 32));
+                offset += 32;
 
-            const data = accountInfo.data;
-            let offset = 8; // Skip discriminator
+                const recipient = new PublicKey(data.slice(offset, offset + 32));
+                offset += 32;
 
-            const owner = new PublicKey(data.slice(offset, offset + 32));
-            offset += 32;
+                const ipfsCidLen = data.readUInt32LE(offset);
+                offset += 4;
+                const ipfsCid = data.slice(offset, offset + ipfsCidLen).toString('utf-8');
+                offset += ipfsCidLen;
 
-            const recipient = new PublicKey(data.slice(offset, offset + 32));
-            offset += 32;
+                const encryptedKeyLen = data.readUInt32LE(offset);
+                offset += 4;
+                const encryptedKey = data.slice(offset, offset + encryptedKeyLen).toString('utf-8');
+                offset += encryptedKeyLen;
 
-            // Read ipfs_cid string
-            const ipfsCidLen = data.readUInt32LE(offset);
-            offset += 4;
-            const ipfsCid = data.slice(offset, offset + ipfsCidLen).toString('utf-8');
-            offset += ipfsCidLen;
+                const timeInterval = new BN(data.slice(offset, offset + 8), 'le');
+                offset += 8;
 
-            // Read encrypted_key string
-            const encryptedKeyLen = data.readUInt32LE(offset);
-            offset += 4;
-            const encryptedKey = data.slice(offset, offset + encryptedKeyLen).toString('utf-8');
-            offset += encryptedKeyLen;
+                const lastCheckIn = new BN(data.slice(offset, offset + 8), 'le');
+                offset += 8;
 
-            // Read time_interval (i64)
-            const timeInterval = new BN(data.slice(offset, offset + 8), 'le');
-            offset += 8;
+                const isReleased = data[offset] === 1;
+                offset += 1;
 
-            // Read last_check_in (i64)
-            const lastCheckIn = new BN(data.slice(offset, offset + 8), 'le');
-            offset += 8;
+                const vaultSeed = new BN(data.slice(offset, offset + 8), 'le');
+                offset += 8;
 
-            // Read is_released (bool)
-            const isReleased = data[offset] === 1;
-            offset += 1;
+                const bump = data[offset];
 
-            // Read bump
-            const bump = data[offset];
+                return {
+                    publicKey: acc.pubkey,
+                    owner,
+                    recipient,
+                    ipfsCid,
+                    encryptedKey,
+                    timeInterval,
+                    lastCheckIn,
+                    isReleased,
+                    vaultSeed,
+                    bump,
+                } as VaultData;
+            });
 
-            const vaultData: VaultData = {
-                owner,
-                recipient,
-                ipfsCid,
-                encryptedKey,
-                timeInterval,
-                lastCheckIn,
-                isReleased,
-                bump,
-            };
-
-            setVault(vaultData);
-            setStatus(calculateStatus(vaultData));
+            setVaults(parsed);
         } catch (err) {
-            console.error('Failed to fetch vault:', err);
-            setError('Failed to load vault data');
+            console.error('Failed to fetch owner vaults:', err);
+            setError('Failed to load vaults');
         } finally {
             setLoading(false);
         }
-    }, [publicKey, connection, calculateStatus]);
+    }, [publicKey, connection]);
 
-    const ping = useCallback(async (): Promise<string> => {
+    const ping = useCallback(async (vault: VaultData): Promise<string> => {
         if (!publicKey || !signTransaction || !signAllTransactions) {
             throw new Error('Wallet not connected');
         }
@@ -161,47 +150,48 @@ export function useVault(): UseVaultResult {
             { commitment: 'confirmed' }
         );
 
-        const [vaultPda] = getVaultPDA(publicKey);
-
-        // Load IDL and create program
         const idl = await import('@/../../deadmans-switch/target/idl/deadmans_switch.json');
         const program = new Program(idl as any, provider);
 
         const tx = await (program.methods as any)
             .ping()
             .accounts({
-                vault: vaultPda,
+                vault: vault.publicKey,
                 owner: publicKey,
             })
             .rpc();
 
-        // Refetch vault data after ping
-        await fetchVault();
+        await fetchVaults();
 
         return tx;
-    }, [publicKey, signTransaction, signAllTransactions, connection, fetchVault]);
+    }, [publicKey, signTransaction, signAllTransactions, connection, fetchVaults]);
 
     useEffect(() => {
-        fetchVault();
-    }, [fetchVault]);
+        fetchVaults();
+    }, [fetchVaults]);
 
-    // Update status every second
-    useEffect(() => {
-        if (!vault) return;
+    return {
+        vaults,
+        loading,
+        error,
+        refetch: fetchVaults,
+        ping,
+        getStatus,
+    };
+}
 
-        const interval = setInterval(() => {
-            setStatus(calculateStatus(vault));
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, [vault, calculateStatus]);
+// Backwards compat: Keep useVault returning single
+export function useVault() {
+    const result = useOwnerVaults();
+    const vault = result.vaults.length > 0 ? result.vaults[0] : null;
+    const status = vault ? result.getStatus(vault) : null;
 
     return {
         vault,
         status,
-        loading,
-        error,
-        refetch: fetchVault,
-        ping,
+        loading: result.loading,
+        error: result.error,
+        refetch: result.refetch,
+        ping: vault ? () => result.ping(vault) : async () => { throw new Error('No vault'); },
     };
 }

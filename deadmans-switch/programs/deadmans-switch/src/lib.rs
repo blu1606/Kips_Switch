@@ -27,6 +27,7 @@ pub mod deadmans_switch {
     /// Creates a PDA owned by the caller to store vault data.
     pub fn initialize_vault(
         ctx: Context<InitializeVault>,
+        seed: u64,
         ipfs_cid: String,
         encrypted_key: String,
         recipient: Pubkey,
@@ -52,11 +53,12 @@ pub mod deadmans_switch {
         vault.time_interval = time_interval;
         vault.last_check_in = clock.unix_timestamp;
         vault.is_released = false;
+        vault.vault_seed = seed;
         vault.bump = ctx.bumps.vault;
 
         msg!("Vault initialized for owner: {}", vault.owner);
+        msg!("Vault Seed: {}", seed);
         msg!("Recipient: {}", vault.recipient);
-        msg!("Time interval: {} seconds", vault.time_interval);
 
         Ok(())
     }
@@ -97,6 +99,13 @@ pub mod deadmans_switch {
 
         Ok(())
     }
+
+    /// Close the vault and reclaim rent back to owner.
+    /// Only the vault owner can call this instruction.
+    pub fn close_vault(_ctx: Context<CloseVault>) -> Result<()> {
+        msg!("Vault closed. Rent reclaimed.");
+        Ok(())
+    }
 }
 
 // ============================================================================
@@ -104,12 +113,13 @@ pub mod deadmans_switch {
 // ============================================================================
 
 #[derive(Accounts)]
+#[instruction(seed: u64)]
 pub struct InitializeVault<'info> {
     #[account(
         init,
         payer = owner,
         space = Vault::SPACE,
-        seeds = [VAULT_SEED, owner.key().as_ref()],
+        seeds = [VAULT_SEED, owner.key().as_ref(), seed.to_le_bytes().as_ref()],
         bump
     )]
     pub vault: Account<'info, Vault>,
@@ -124,8 +134,6 @@ pub struct InitializeVault<'info> {
 pub struct Ping<'info> {
     #[account(
         mut,
-        seeds = [VAULT_SEED, owner.key().as_ref()],
-        bump = vault.bump,
         has_one = owner @ VaultError::Unauthorized
     )]
     pub vault: Account<'info, Vault>,
@@ -135,12 +143,21 @@ pub struct Ping<'info> {
 
 #[derive(Accounts)]
 pub struct TriggerRelease<'info> {
+    #[account(mut)]
+    pub vault: Account<'info, Vault>,
+}
+
+#[derive(Accounts)]
+pub struct CloseVault<'info> {
     #[account(
         mut,
-        seeds = [VAULT_SEED, vault.owner.as_ref()],
-        bump = vault.bump
+        close = owner,
+        has_one = owner @ VaultError::Unauthorized
     )]
     pub vault: Account<'info, Vault>,
+
+    #[account(mut)]
+    pub owner: Signer<'info>,
 }
 
 // ============================================================================
@@ -170,14 +187,18 @@ pub struct Vault {
     /// Whether the vault has been released
     pub is_released: bool, // 1 byte
 
+    /// Unique seed for this vault
+    pub vault_seed: u64, // 8 bytes
+
     /// PDA bump seed
     pub bump: u8, // 1 byte
 }
 
 impl Vault {
     /// Calculate the space needed for a Vault account
-    /// 8 (discriminator) + 32 + 32 + (4 + 64) + (4 + 128) + 8 + 8 + 1 + 1 = 290 bytes
-    pub const SPACE: usize = 8 + 32 + 32 + (4 + MAX_IPFS_CID_LEN) + (4 + MAX_ENCRYPTED_KEY_LEN) + 8 + 8 + 1 + 1;
+    /// Original: 290 bytes
+    /// New: 290 + 8 (seed) = 298 bytes
+    pub const SPACE: usize = 8 + 32 + 32 + (4 + MAX_IPFS_CID_LEN) + (4 + MAX_ENCRYPTED_KEY_LEN) + 8 + 8 + 1 + 8 + 1;
 }
 
 // ============================================================================

@@ -81,6 +81,10 @@ export function useRecipientVaults() {
 
                 const isReleased = data[offset] === 1;
                 offset += 1; // bool
+
+                const vaultSeed = new BN(data.slice(offset, offset + 8), 'le');
+                offset += 8;
+
                 const bump = data[offset];
 
                 return {

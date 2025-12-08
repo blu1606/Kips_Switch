@@ -66,14 +66,11 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
                 { commitment: 'confirmed' }
             );
 
-            // Get vault PDA
-            const [vaultPda] = getVaultPDA(publicKey);
+            // Generate a unique seed for this vault
+            const seed = new BN(Date.now());
 
-            // Check if vault already exists
-            const accountInfo = await connection.getAccountInfo(vaultPda);
-            if (accountInfo) {
-                throw new Error('You already have a vault! This demo supports only one vault per wallet. Please switch wallets to create a new one.');
-            }
+            // Get vault PDA
+            const [vaultPda] = getVaultPDA(publicKey, seed);
 
             // Create the instruction manually since we don't have IDL loaded
             // For now, we'll use a simplified approach
@@ -86,6 +83,7 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
 
             const tx = await (program.methods as any)
                 .initializeVault(
+                    seed, // Pass seed as first argument
                     cid,
                     formData.aesKeyBase64,
                     recipientPubkey,

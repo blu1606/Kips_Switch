@@ -9,6 +9,11 @@ const WalletContextProvider = dynamic(
     { ssr: false }
 );
 
+const Header = dynamic(
+    () => import('@/components/layout/Header'),
+    { ssr: false }
+);
+
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -26,7 +31,10 @@ export default function RootLayout({
         <html lang="en">
             <body className={inter.className}>
                 <WalletContextProvider>
-                    {children}
+                    <Header />
+                    <div className="pt-16 md:pt-16">
+                        {children}
+                    </div>
                 </WalletContextProvider>
             </body>
         </html>
