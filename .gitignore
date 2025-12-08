@@ -1,0 +1,11 @@
+.agent
+.env
+.env.local
+best-practices
+node_modules
+.next
+node_modules
+next-env.d.ts
+next.config.js
+.next
+yarn.lock

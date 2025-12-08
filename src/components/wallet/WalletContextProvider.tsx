@@ -1,0 +1,55 @@
+'use client';
+
+import { FC, ReactNode, useMemo, useState, useEffect } from 'react';
+import {
+    ConnectionProvider,
+    WalletProvider,
+} from '@solana/wallet-adapter-react';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
+import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
+import { clusterApiUrl } from '@solana/web3.js';
+
+// Import wallet adapter styles
+import '@solana/wallet-adapter-react-ui/styles.css';
+
+interface Props {
+    children: ReactNode;
+}
+
+const WalletContextProvider: FC<Props> = ({ children }) => {
+    const [mounted, setMounted] = useState(false);
+
+    // Use devnet for MVP
+    const endpoint = useMemo(() => clusterApiUrl('devnet'), []);
+
+    // Supported wallets
+    const wallets = useMemo(
+        () => [
+            new PhantomWalletAdapter(),
+            new SolflareWalletAdapter(),
+        ],
+        []
+    );
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // Prevent hydration mismatch by not rendering wallet providers until mounted
+    if (!mounted) {
+        return <>{children}</>;
+    }
+
+    return (
+        <ConnectionProvider endpoint={endpoint}>
+            <WalletProvider wallets={wallets} autoConnect>
+                <WalletModalProvider>
+                    {children}
+                </WalletModalProvider>
+            </WalletProvider>
+        </ConnectionProvider>
+    );
+};
+
+export default WalletContextProvider;
