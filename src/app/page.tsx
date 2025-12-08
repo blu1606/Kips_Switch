@@ -4,6 +4,7 @@ import Link from 'next/link';
 import WalletButton from '@/components/wallet/WalletButton';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { motion } from 'framer-motion';
+import { Activity, Lock, ScrollText, Sparkles } from 'lucide-react';
 import ProblemSection from '@/components/landing/ProblemSection';
 import UseCaseGrid from '@/components/landing/UseCaseGrid';
 import FAQSection from '@/components/landing/FAQSection';
@@ -46,7 +47,7 @@ export default function Home() {
                                     <>
                                         <Link href="/create" className="btn-primary text-lg px-8 py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-primary-900/20 hover:shadow-primary-500/20 transition-all">
                                             <span>Create Vault</span>
-                                            <span className="text-xl">✨</span>
+                                            <Sparkles className="w-5 h-5" />
                                         </Link>
                                         <Link href="/dashboard" className="px-8 py-4 rounded-2xl bg-dark-800/40 border border-white/5 hover:bg-dark-800/60 transition-all text-white font-medium text-lg flex items-center justify-center">
                                             My Sanctuaries
@@ -74,12 +75,16 @@ export default function Home() {
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.2, duration: 0.6 }}
                         >
-                            <div className="absolute top-4 right-4 text-xs font-mono text-primary-400/80 border border-primary-500/20 px-2 py-1 rounded-full">
+                            <div className="absolute top-4 right-4 text-xs font-mono text-primary-400/80 border border-primary-500/20 px-2 py-1 rounded-full flex items-center gap-2">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
+                                </span>
                                 SYSTEM_ACTIVE
                             </div>
                             <div className="h-full flex flex-col justify-end relative z-10">
-                                <div className="w-16 h-16 rounded-full bg-primary-500/20 flex items-center justify-center mb-6 backdrop-blur-md group-hover:scale-110 transition-transform duration-500">
-                                    <div className="w-8 h-8 rounded-full bg-primary-500 animate-pulse-slow" />
+                                <div className="w-16 h-16 rounded-full bg-primary-500/20 flex items-center justify-center mb-6 backdrop-blur-md group-hover:scale-110 transition-transform duration-500 border border-primary-500/20">
+                                    <Activity className="w-8 h-8 text-primary-400 animate-pulse-slow" />
                                 </div>
                                 <h3 className="text-2xl font-bold text-white mb-2">The Heartbeat</h3>
                                 <p className="text-dark-300 text-sm leading-relaxed">
@@ -114,20 +119,22 @@ export default function Home() {
                                 </p>
                             </div>
 
-                            <div className="absolute bottom-[-10%] right-[-10%] text-[12rem] opacity-[0.03] rotate-[-15deg] pointer-events-none select-none">
-                                🔒
+                            <div className="absolute bottom-[-10%] right-[-10%] opacity-[0.03] rotate-[-15deg] pointer-events-none select-none">
+                                <Lock className="w-48 h-48" />
                             </div>
                         </motion.div>
 
                         {/* Cell 3: Legacy (Wide, Bottom Left) */}
                         <motion.div
-                            className="glass-panel p-8 rounded-3xl col-span-2 sm:col-span-1 relative overflow-hidden"
+                            className="glass-panel p-8 rounded-3xl col-span-2 sm:col-span-1 relative overflow-hidden group bg-gradient-to-r from-dark-800/40 to-primary-900/10"
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.6, duration: 0.6 }}
                         >
                             <div className="flex items-center gap-4 mb-4">
-                                <span className="text-3xl filter grayscale opacity-70 group-hover:grayscale-0 transition-all duration-500">📜</span>
+                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary-400/30 transition-colors">
+                                    <ScrollText className="w-6 h-6 text-primary-200" />
+                                </div>
                                 <h3 className="text-xl font-bold text-white">The Reveal</h3>
                             </div>
                             <p className="text-dark-300 text-sm">
