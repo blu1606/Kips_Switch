@@ -122,8 +122,8 @@ export default function DashboardPage() {
                                         {/* Center: Info */}
                                         <div className="flex-1 w-full text-center md:text-left">
                                             <div className="flex items-center justify-center md:justify-start gap-4 mb-2">
-                                                <h3 className="text-xl font-bold font-mono tracking-tight text-white">
-                                                    VAULT-{key.slice(0, 4)}
+                                                <h3 className="text-xl font-bold tracking-tight text-white">
+                                                    {(vault as any).name || `VAULT-${key.slice(0, 4)}`}
                                                 </h3>
                                                 <span className="bg-dark-800 text-dark-400 text-[10px] px-2 py-0.5 rounded font-mono">
                                                     {truncateAddress(key)}

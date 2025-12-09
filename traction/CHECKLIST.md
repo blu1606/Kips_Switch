@@ -73,6 +73,19 @@
 - [ ] 7.3 Email Magic Link
   - [x] UI: Settings toggle (Mock)
 
+### Phase 10: Enhanced Content ~70%
+- [x] 10.1 Vault Naming ✅ Done
+  - [x] Contract: name field
+  - [x] UI: Create/Confirm/Edit
+- [x] 10.2 Multi-Media Bundle ✅ Done
+  - [x] Types & Utils
+  - [x] VaultContentEditor Component
+  - [x] Full Refactor: StepUploadSecret → VaultContentEditor
+  - [x] StepConfirm bundle encryption
+  - [x] Claim page bundle display
+- [ ] 10.3 Content Versioning (Pending)
+- [ ] 10.4 Token Locking (Pending)
+
 ---
 
 ## 📝 Spec Ready (Not Started)
@@ -101,7 +114,9 @@
 | Phase 6: Roadmap | ⏳ Near | 90% |
 | Phase 7: Decentralization | 🔄 Active | 60% |
 | Phase 8: Growth | ✅ Done | 100% |
+| Phase 8: Growth | ✅ Done | 100% |
 | Phase 9: AI | 📝 Spec | 10% |
+| Phase 10: Content | 🔄 Active | 40% |
 | Create Vault UX | ✅ Done | 100% |
 | Brand Identity | 📝 Spec | 25% |
 
@@ -109,9 +124,10 @@
 
 ## 🎯 Next Priority Actions (48h)
 
-1. **Phase 9:** AI Integration (Kip's Personality + Smart Hints)
-2. **Phase 4.4:** Mainnet deploy
-3. **Phase 7.1:** Gravedigger SDK (Community Bot)
+1. **Phase 10.2:** Multi-Media Bundle (Full Refactor)
+2. **Phase 10.3:** Content Additions
+3. **Phase 9:** AI Integration
+4. **Phase 4.4:** Mainnet deploy
 
 ---
 

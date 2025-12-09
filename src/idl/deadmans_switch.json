@@ -10,9 +10,7 @@
     {
       "name": "claim_and_close",
       "docs": [
-        "Claim the vault contents and close it.",
-        "Only the recipient can call this, and only after vault is expired.",
-        "Rent is transferred to the recipient as inheritance bonus."
+        "Claim the vault contents and close it."
       ],
       "discriminator": [
         177,
@@ -43,8 +41,7 @@
     {
       "name": "close_vault",
       "docs": [
-        "Close the vault and reclaim rent back to owner.",
-        "Only the vault owner can call this instruction."
+        "Close the vault and reclaim rent back to owner."
       ],
       "discriminator": [
         141,
@@ -75,9 +72,7 @@
     {
       "name": "initialize_vault",
       "docs": [
-        "Initialize a new vault with dead man's switch functionality.",
-        "Creates a PDA owned by the caller to store vault data.",
-        "7.1: Now accepts optional bounty_lamports for Bounty Hunter Protocol."
+        "Initialize a new vault with dead man's switch functionality."
       ],
       "discriminator": [
         48,
@@ -150,14 +145,17 @@
         {
           "name": "bounty_lamports",
           "type": "u64"
+        },
+        {
+          "name": "name",
+          "type": "string"
         }
       ]
     },
     {
       "name": "ping",
       "docs": [
-        "Ping (check-in) to reset the dead man's switch timer.",
-        "Owner OR delegate can call this instruction (6.1 Frictionless Check-in)."
+        "Ping (check-in) to reset the dead man's switch timer."
       ],
       "discriminator": [
         173,
@@ -177,7 +175,7 @@
         {
           "name": "signer",
           "docs": [
-            "The signer - can be owner or delegate (validated in instruction)"
+            "The signer - can be owner or delegate (validated in handler)"
           ],
           "signer": true
         }
@@ -187,9 +185,7 @@
     {
       "name": "set_delegate",
       "docs": [
-        "Set or clear the delegate wallet that can ping on owner's behalf.",
-        "Only the vault owner can call this instruction.",
-        "The delegate can ONLY ping - they cannot update vault settings or close it."
+        "Set or clear the delegate wallet that can ping on owner's behalf."
       ],
       "discriminator": [
         242,
@@ -226,8 +222,7 @@
     {
       "name": "top_up_bounty",
       "docs": [
-        "Add more SOL to the bounty pool.",
-        "Only the owner can top up."
+        "Add more SOL to the bounty pool."
       ],
       "discriminator": [
         92,
@@ -267,9 +262,7 @@
     {
       "name": "trigger_release",
       "docs": [
-        "Trigger the release of vault contents if the timer has expired.",
-        "Anyone can call this (permissionless), but it only succeeds if the vault has expired.",
-        "7.1: Hunter who triggers receives the bounty as reward."
+        "Trigger the release of vault contents if the timer has expired."
       ],
       "discriminator": [
         101,
@@ -300,8 +293,7 @@
     {
       "name": "update_vault",
       "docs": [
-        "Update vault settings (recipient and/or interval).",
-        "Only the vault owner can call this, and only if vault is not released."
+        "Update vault settings (recipient and/or interval)."
       ],
       "discriminator": [
         67,
@@ -337,6 +329,12 @@
           "name": "new_time_interval",
           "type": {
             "option": "i64"
+          }
+        },
+        {
+          "name": "new_name",
+          "type": {
+            "option": "string"
           }
         }
       ]
@@ -402,11 +400,19 @@
       "code": 6008,
       "name": "InsufficientBalance",
       "msg": "Insufficient balance to maintain rent exemption"
+    },
+    {
+      "code": 6009,
+      "name": "NameTooLong",
+      "msg": "Vault name exceeds maximum length of 32 characters"
     }
   ],
   "types": [
     {
       "name": "Vault",
+      "docs": [
+        "The Vault account that stores all data for a dead man's switch."
+      ],
       "type": {
         "kind": "struct",
         "fields": [
@@ -476,8 +482,7 @@
           {
             "name": "delegate",
             "docs": [
-              "6.1: Delegated wallet that can only call ping()",
-              "This allows a \"hot wallet\" to check-in without having full control"
+              "Delegated wallet that can only call ping()"
             ],
             "type": {
               "option": "pubkey"
@@ -486,9 +491,16 @@
           {
             "name": "bounty_lamports",
             "docs": [
-              "7.1: Bounty for the hunter who triggers release after expiry"
+              "Bounty for the hunter who triggers release after expiry"
             ],
             "type": "u64"
+          },
+          {
+            "name": "name",
+            "docs": [
+              "Human-readable vault name"
+            ],
+            "type": "string"
           }
         ]
       }

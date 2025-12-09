@@ -1,31 +1,26 @@
+//! Deadman's Switch - A Solana program for dead man's switch functionality.
+//! 
+//! Allows users to create vaults that automatically release to recipients
+//! if the owner doesn't check in within a specified time interval.
+
+mod constants;
+mod errors;
+mod instructions;
+mod state;
+
 use anchor_lang::prelude::*;
+pub use constants::*;
+pub use errors::*;
+use instructions::*;
+pub use state::*;
 
 declare_id!("HnFEhMS84CabpztHCDdGGN8798NxNse7NtXW4aG17XpB");
-
-// ============================================================================
-// CONSTANTS
-// ============================================================================
-
-/// Seeds for Vault PDA
-pub const VAULT_SEED: &[u8] = b"vault";
-
-/// Maximum length of IPFS CID (CIDv1 base32 = ~59 chars, add padding)
-pub const MAX_IPFS_CID_LEN: usize = 64;
-
-/// Maximum length of encrypted AES key (base64 encoded)
-pub const MAX_ENCRYPTED_KEY_LEN: usize = 128;
-
-// ============================================================================
-// PROGRAM
-// ============================================================================
 
 #[program]
 pub mod deadmans_switch {
     use super::*;
 
     /// Initialize a new vault with dead man's switch functionality.
-    /// Creates a PDA owned by the caller to store vault data.
-    /// 7.1: Now accepts optional bounty_lamports for Bounty Hunter Protocol.
     pub fn initialize_vault(
         ctx: Context<InitializeVault>,
         seed: u64,
@@ -33,408 +28,49 @@ pub mod deadmans_switch {
         encrypted_key: String,
         recipient: Pubkey,
         time_interval: i64,
-        bounty_lamports: u64, // 7.1: Optional bounty for hunter
+        bounty_lamports: u64,
+        name: String,
     ) -> Result<()> {
-        require!(
-            ipfs_cid.len() <= MAX_IPFS_CID_LEN,
-            VaultError::IpfsCidTooLong
-        );
-        require!(
-            encrypted_key.len() <= MAX_ENCRYPTED_KEY_LEN,
-            VaultError::EncryptedKeyTooLong
-        );
-        require!(time_interval > 0, VaultError::InvalidTimeInterval);
-
-        let vault = &mut ctx.accounts.vault;
-        let clock = Clock::get()?;
-
-        vault.owner = ctx.accounts.owner.key();
-        vault.recipient = recipient;
-        vault.ipfs_cid = ipfs_cid;
-        vault.encrypted_key = encrypted_key;
-        vault.time_interval = time_interval;
-        vault.last_check_in = clock.unix_timestamp;
-        vault.is_released = false;
-        vault.vault_seed = seed;
-        vault.bump = ctx.bumps.vault;
-        vault.delegate = None; // 6.1: Initialize with no delegate
-        vault.bounty_lamports = bounty_lamports; // 7.1: Store bounty amount
-
-        // 7.1: Transfer bounty from owner to vault PDA
-        if bounty_lamports > 0 {
-            anchor_lang::system_program::transfer(
-                CpiContext::new(
-                    ctx.accounts.system_program.to_account_info(),
-                    anchor_lang::system_program::Transfer {
-                        from: ctx.accounts.owner.to_account_info(),
-                        to: vault.to_account_info(),
-                    },
-                ),
-                bounty_lamports,
-            )?;
-        }
-
-        msg!("Vault initialized for owner: {}", vault.owner);
-        msg!("Vault Seed: {}", seed);
-        msg!("Recipient: {}", vault.recipient);
-        msg!("Bounty: {} lamports", bounty_lamports);
-
-        Ok(())
+        ctx.accounts.handler(seed, ipfs_cid, encrypted_key, recipient, time_interval, bounty_lamports, name, ctx.bumps.vault)
     }
 
     /// Ping (check-in) to reset the dead man's switch timer.
-    /// Owner OR delegate can call this instruction (6.1 Frictionless Check-in).
     pub fn ping(ctx: Context<Ping>) -> Result<()> {
-        let vault = &mut ctx.accounts.vault;
-        let clock = Clock::get()?;
-
-        require!(!vault.is_released, VaultError::AlreadyReleased);
-
-        // 6.1: Authorization check - allow owner OR delegate
-        let signer = ctx.accounts.signer.key();
-        let is_owner = signer == vault.owner;
-        let is_delegate = vault.delegate.map_or(false, |d| d == signer);
-        
-        require!(is_owner || is_delegate, VaultError::Unauthorized);
-
-        vault.last_check_in = clock.unix_timestamp;
-
-        msg!("Ping successful by {}. Timer reset to: {}", 
-            if is_owner { "owner" } else { "delegate" },
-            vault.last_check_in
-        );
-
-        Ok(())
+        ctx.accounts.handler()
     }
 
     /// Set or clear the delegate wallet that can ping on owner's behalf.
-    /// Only the vault owner can call this instruction.
-    /// The delegate can ONLY ping - they cannot update vault settings or close it.
     pub fn set_delegate(ctx: Context<SetDelegate>, new_delegate: Option<Pubkey>) -> Result<()> {
-        let vault = &mut ctx.accounts.vault;
-
-        require!(!vault.is_released, VaultError::AlreadyReleased);
-
-        vault.delegate = new_delegate;
-
-        match new_delegate {
-            Some(delegate) => msg!("Delegate set to: {}", delegate),
-            None => msg!("Delegate cleared"),
-        }
-
-        Ok(())
+        ctx.accounts.handler(new_delegate)
     }
 
     /// Trigger the release of vault contents if the timer has expired.
-    /// Anyone can call this (permissionless), but it only succeeds if the vault has expired.
-    /// 7.1: Hunter who triggers receives the bounty as reward.
     pub fn trigger_release(ctx: Context<TriggerRelease>) -> Result<()> {
-        let vault = &mut ctx.accounts.vault;
-        let clock = Clock::get()?;
-
-        require!(!vault.is_released, VaultError::AlreadyReleased);
-
-        let expiry_time = vault
-            .last_check_in
-            .checked_add(vault.time_interval)
-            .ok_or(VaultError::Overflow)?;
-
-        require!(clock.unix_timestamp > expiry_time, VaultError::NotExpired);
-
-        // 7.1: Pay bounty to hunter
-        let bounty = vault.bounty_lamports;
-        if bounty > 0 {
-            // Check rent exemption before transferring bounty
-            let vault_lamports = vault.to_account_info().lamports();
-            let rent = Rent::get()?;
-            let min_rent = rent.minimum_balance(Vault::SPACE);
-            require!(
-                vault_lamports.saturating_sub(bounty) >= min_rent,
-                VaultError::InsufficientBalance
-            );
-
-            **vault.to_account_info().try_borrow_mut_lamports()? -= bounty;
-            **ctx.accounts.hunter.to_account_info().try_borrow_mut_lamports()? += bounty;
-            vault.bounty_lamports = 0;
-            msg!("Bounty of {} lamports paid to hunter: {}", bounty, ctx.accounts.hunter.key());
-        }
-
-        vault.is_released = true;
-
-        msg!("Vault released! Recipient {} can now claim.", vault.recipient);
-
-        Ok(())
+        ctx.accounts.handler()
     }
 
     /// Add more SOL to the bounty pool.
-    /// Only the owner can top up.
     pub fn top_up_bounty(ctx: Context<TopUpBounty>, amount: u64) -> Result<()> {
-        let vault = &mut ctx.accounts.vault;
-
-        require!(!vault.is_released, VaultError::AlreadyReleased);
-        require!(amount > 0, VaultError::InvalidAmount);
-
-        // Transfer SOL from owner to vault
-        anchor_lang::system_program::transfer(
-            CpiContext::new(
-                ctx.accounts.system_program.to_account_info(),
-                anchor_lang::system_program::Transfer {
-                    from: ctx.accounts.owner.to_account_info(),
-                    to: vault.to_account_info(),
-                },
-            ),
-            amount,
-        )?;
-
-        vault.bounty_lamports = vault.bounty_lamports.checked_add(amount).ok_or(VaultError::Overflow)?;
-
-        msg!("Bounty topped up by {} lamports. Total: {}", amount, vault.bounty_lamports);
-
-        Ok(())
+        ctx.accounts.handler(amount)
     }
 
     /// Update vault settings (recipient and/or interval).
-    /// Only the vault owner can call this, and only if vault is not released.
     pub fn update_vault(
         ctx: Context<UpdateVault>,
         new_recipient: Option<Pubkey>,
         new_time_interval: Option<i64>,
+        new_name: Option<String>,
     ) -> Result<()> {
-        let vault = &mut ctx.accounts.vault;
-
-        require!(!vault.is_released, VaultError::AlreadyReleased);
-
-        if let Some(recipient) = new_recipient {
-            vault.recipient = recipient;
-            msg!("Recipient updated to: {}", recipient);
-        }
-
-        if let Some(interval) = new_time_interval {
-            require!(interval > 0, VaultError::InvalidTimeInterval);
-            vault.time_interval = interval;
-            msg!("Time interval updated to: {} seconds", interval);
-        }
-
-        Ok(())
+        ctx.accounts.handler(new_recipient, new_time_interval, new_name)
     }
 
     /// Close the vault and reclaim rent back to owner.
-    /// Only the vault owner can call this instruction.
-    pub fn close_vault(_ctx: Context<CloseVault>) -> Result<()> {
-        msg!("Vault closed by owner. Rent reclaimed.");
-        Ok(())
+    pub fn close_vault(ctx: Context<CloseVault>) -> Result<()> {
+        ctx.accounts.handler()
     }
 
     /// Claim the vault contents and close it.
-    /// Only the recipient can call this, and only after vault is expired.
-    /// Rent is transferred to the recipient as inheritance bonus.
     pub fn claim_and_close(ctx: Context<ClaimAndClose>) -> Result<()> {
-        let vault = &ctx.accounts.vault;
-        let clock = Clock::get()?;
-
-        // Check if vault is expired (allow claim even if not formally released)
-        let expiry_time = vault
-            .last_check_in
-            .checked_add(vault.time_interval)
-            .ok_or(VaultError::Overflow)?;
-
-        require!(
-            clock.unix_timestamp > expiry_time || vault.is_released,
-            VaultError::NotExpired
-        );
-
-        msg!("Vault claimed and closed by recipient: {}", vault.recipient);
-        msg!("Rent transferred to recipient.");
-
-        Ok(())
+        ctx.accounts.handler()
     }
-}
-
-// ============================================================================
-// ACCOUNTS
-// ============================================================================
-
-#[derive(Accounts)]
-#[instruction(seed: u64)]
-pub struct InitializeVault<'info> {
-    #[account(
-        init,
-        payer = owner,
-        space = Vault::SPACE,
-        seeds = [VAULT_SEED, owner.key().as_ref(), seed.to_le_bytes().as_ref()],
-        bump
-    )]
-    pub vault: Account<'info, Vault>,
-
-    #[account(mut)]
-    pub owner: Signer<'info>,
-
-    pub system_program: Program<'info, System>,
-}
-
-/// 6.1: Updated Ping accounts - signer can be owner OR delegate
-#[derive(Accounts)]
-pub struct Ping<'info> {
-    #[account(mut)]
-    pub vault: Account<'info, Vault>,
-
-    /// The signer - can be owner or delegate (validated in instruction)
-    pub signer: Signer<'info>,
-}
-
-/// 6.1: New instruction for setting delegate
-#[derive(Accounts)]
-pub struct SetDelegate<'info> {
-    #[account(
-        mut,
-        has_one = owner @ VaultError::Unauthorized
-    )]
-    pub vault: Account<'info, Vault>,
-
-    pub owner: Signer<'info>,
-}
-
-#[derive(Accounts)]
-pub struct TriggerRelease<'info> {
-    #[account(mut)]
-    pub vault: Account<'info, Vault>,
-
-    /// The hunter who triggers the release and receives the bounty
-    #[account(mut)]
-    pub hunter: Signer<'info>,
-    // Note: system_program removed - not needed for direct lamport manipulation
-}
-
-#[derive(Accounts)]
-pub struct UpdateVault<'info> {
-    #[account(
-        mut,
-        has_one = owner @ VaultError::Unauthorized
-    )]
-    pub vault: Account<'info, Vault>,
-
-    pub owner: Signer<'info>,
-}
-
-#[derive(Accounts)]
-pub struct TopUpBounty<'info> {
-    #[account(
-        mut,
-        has_one = owner @ VaultError::Unauthorized
-    )]
-    pub vault: Account<'info, Vault>,
-
-    #[account(mut)]
-    pub owner: Signer<'info>,
-
-    pub system_program: Program<'info, System>,
-}
-
-#[derive(Accounts)]
-pub struct CloseVault<'info> {
-    #[account(
-        mut,
-        close = owner,
-        has_one = owner @ VaultError::Unauthorized
-    )]
-    pub vault: Account<'info, Vault>,
-
-    #[account(mut)]
-    pub owner: Signer<'info>,
-}
-
-#[derive(Accounts)]
-pub struct ClaimAndClose<'info> {
-    #[account(
-        mut,
-        close = recipient,
-        has_one = recipient @ VaultError::Unauthorized
-    )]
-    pub vault: Account<'info, Vault>,
-
-    #[account(mut)]
-    pub recipient: Signer<'info>,
-}
-
-// ============================================================================
-// STATE
-// ============================================================================
-
-#[account]
-pub struct Vault {
-    /// The wallet that created this vault
-    pub owner: Pubkey, // 32 bytes
-
-    /// The wallet that can claim when released
-    pub recipient: Pubkey, // 32 bytes
-
-    /// IPFS CID of the encrypted file
-    pub ipfs_cid: String, // 4 + MAX_IPFS_CID_LEN bytes
-
-    /// Base64-encoded encrypted AES key
-    pub encrypted_key: String, // 4 + MAX_ENCRYPTED_KEY_LEN bytes
-
-    /// Check-in interval in seconds
-    pub time_interval: i64, // 8 bytes
-
-    /// Timestamp of last check-in
-    pub last_check_in: i64, // 8 bytes
-
-    /// Whether the vault has been released
-    pub is_released: bool, // 1 byte
-
-    /// Unique seed for this vault
-    pub vault_seed: u64, // 8 bytes
-
-    /// PDA bump seed
-    pub bump: u8, // 1 byte
-
-    /// 6.1: Delegated wallet that can only call ping()
-    /// This allows a "hot wallet" to check-in without having full control
-    pub delegate: Option<Pubkey>, // 1 + 32 = 33 bytes
-
-    /// 7.1: Bounty for the hunter who triggers release after expiry
-    pub bounty_lamports: u64, // 8 bytes
-}
-
-impl Vault {
-    /// Calculate the space needed for a Vault account
-    /// Original: 298 bytes
-    /// With delegate: 298 + 33 (Option<Pubkey>) = 331 bytes
-    /// With bounty: 331 + 8 (u64) = 339 bytes
-    pub const SPACE: usize = 8 + 32 + 32 + (4 + MAX_IPFS_CID_LEN) + (4 + MAX_ENCRYPTED_KEY_LEN) + 8 + 8 + 1 + 8 + 1 + 33 + 8;
-}
-
-// ============================================================================
-// ERRORS
-// ============================================================================
-
-#[error_code]
-pub enum VaultError {
-    #[msg("Only the vault owner or delegate can perform this action")]
-    Unauthorized,
-
-    #[msg("Vault timer has not expired yet")]
-    NotExpired,
-
-    #[msg("Vault has already been released")]
-    AlreadyReleased,
-
-    #[msg("IPFS CID exceeds maximum length")]
-    IpfsCidTooLong,
-
-    #[msg("Encrypted key exceeds maximum length")]
-    EncryptedKeyTooLong,
-
-    #[msg("Time interval must be greater than 0")]
-    InvalidTimeInterval,
-
-    #[msg("Arithmetic overflow occurred")]
-    Overflow,
-
-    #[msg("Amount must be greater than 0")]
-    InvalidAmount,
-
-    #[msg("Insufficient balance to maintain rent exemption")]
-    InsufficientBalance,
 }

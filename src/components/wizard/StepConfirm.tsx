@@ -7,6 +7,7 @@ import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
 import { VaultFormData } from '@/app/create/page';
 import { uploadToIPFSWithRetry } from '@/utils/ipfs';
 import { PROGRAM_ID, getVaultPDA } from '@/utils/anchor';
+import { createEmptyBundle, addItemToBundle, bundleToBlob } from '@/utils/vaultBundle';
 
 interface Props {
     formData: VaultFormData;
@@ -24,6 +25,9 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
     const [error, setError] = useState<string | null>(null);
     const [ipfsCid, setIpfsCid] = useState<string | null>(null);
     const [txSignature, setTxSignature] = useState<string | null>(null);
+
+    // Vault name state (10.1)
+    const [vaultName, setVaultName] = useState(formData.vaultName || '');
 
     // Email state
     const [ownerEmail, setOwnerEmail] = useState('');
@@ -64,15 +68,58 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
             let blobToUpload = formData.encryptedBlob;
             const seed = new BN(Date.now());
 
-            // If wallet mode, encrypt now with recipient pubkey
-            if (formData.encryptionMode === 'wallet' && !formData.encryptedBlob && formData.file) {
-                const { createWalletProtectedVaultPackage } = await import('@/utils/crypto');
-                const result = await createWalletProtectedVaultPackage(
-                    formData.file,
-                    formData.recipientAddress,
-                    seed.toString()
-                );
-                blobToUpload = result.blob;
+            // 10.2: Handle Bundle Encryption (if not already encrypted)
+            if (!blobToUpload) {
+                // Determine source file: either a bundle of items OR legacy single file
+                let fileToEncrypt: File | null = formData.file;
+
+                if (formData.bundleItems && formData.bundleItems.length > 0) {
+                    // Create Bundle
+                    let bundle = createEmptyBundle();
+                    // Assuming items are already fully formed VaultItems (from VaultContentEditor)
+                    // We just need to add them to the bundle struct correctly
+                    // VaultContentEditor returns full VaultItems, but addItemToBundle expects Omit<VaultItem, id|createdAt>
+                    // Actually, VaultContentEditor creates full items. We can just push them to bundle.items if we trust them, 
+                    // or re-add them. For simplicity, let's assemble manually to match util expectations or just use the utility
+
+                    // Re-constructing mostly to ensure metadata is fresh
+                    bundle.items = formData.bundleItems;
+                    bundle.metadata = {
+                        totalSize: formData.bundleItems.reduce((acc, item) => acc + item.size, 0),
+                        itemCount: formData.bundleItems.length
+                    };
+
+                    const bundleBlob = bundleToBlob(bundle);
+                    fileToEncrypt = new File([bundleBlob], 'vault_bundle.json', { type: 'application/json' });
+                }
+
+                if (!fileToEncrypt) {
+                    throw new Error('No content to encrypt');
+                }
+
+                if (formData.encryptionMode === 'wallet') {
+                    // Wallet Mode
+                    const { createWalletProtectedVaultPackage } = await import('@/utils/crypto');
+                    const result = await createWalletProtectedVaultPackage(
+                        fileToEncrypt,
+                        formData.recipientAddress,
+                        seed.toString()
+                    );
+                    blobToUpload = result.blob;
+                } else if (formData.encryptionMode === 'password') {
+                    // Password Mode (Late encryption if needed, though usually StepUploadSecret does this)
+                    // If StepUploadSecret did NOT encrypt yet (e.g. we changed flow), do it here.
+                    // IMPORTANT: StepUploadSecret current logic asks for password map, but if we moved to lazy encryption, we need password here.
+                    // The new StepUploadSecret passes 'password' in formData but didn't encrypt yet.
+                    if (!formData.password) throw new Error('Password required for encryption');
+
+                    const { createPasswordProtectedVaultPackage } = await import('@/utils/crypto');
+                    const result = await createPasswordProtectedVaultPackage(
+                        fileToEncrypt,
+                        formData.password
+                    );
+                    blobToUpload = result.blob;
+                }
             }
 
             if (!blobToUpload) {
@@ -110,7 +157,8 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
                     keyInfo,
                     recipientPubkey,
                     new BN(formData.timeInterval),
-                    new BN(10_000_000) // 7.1: 0.01 SOL bounty in lamports
+                    new BN(10_000_000), // 0.01 SOL bounty
+                    vaultName || 'Untitled Vault' // 10.1: Vault name
                 )
                 .accounts({
                     vault: vaultPda,
@@ -161,6 +209,20 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
                 <p className="text-dark-400 text-sm">
                     Review your vault settings before creating.
                 </p>
+            </div>
+
+            {/* Vault Name Input - 10.1 */}
+            <div className="bg-dark-800 rounded-lg p-4 border border-dark-700">
+                <label className="block text-sm text-dark-400 mb-2">Vault Name (optional)</label>
+                <input
+                    type="text"
+                    placeholder="My Vault"
+                    maxLength={32}
+                    value={vaultName}
+                    onChange={(e) => setVaultName(e.target.value)}
+                    className="w-full bg-dark-900 border border-dark-600 rounded-lg px-4 py-3 text-white focus:border-primary-500 focus:outline-none transition-colors"
+                />
+                <p className="text-xs text-dark-500 mt-1">Give your vault a memorable name</p>
             </div>
 
             {/* Summary Cards */}

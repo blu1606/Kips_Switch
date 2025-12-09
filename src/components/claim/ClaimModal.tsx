@@ -8,6 +8,8 @@ import { fetchFromIPFS } from '@/utils/ipfs';
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import VaultSafe from './VaultSafe';
 import AssetCard from './AssetCard';
+import VaultContentEditor from '@/components/vault/VaultContentEditor';
+import { VaultItem } from '@/types/vaultBundle';
 
 interface ClaimModalProps {
     vault: any;
@@ -36,6 +38,7 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
     const [fileType, setFileType] = useState<string>('');
     const [fileName, setFileName] = useState<string>('');
     const [downloadBlob, setDownloadBlob] = useState<Blob | null>(null);
+    const [bundleItems, setBundleItems] = useState<VaultItem[] | null>(null);
     const [vaultClosed, setVaultClosed] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
 
@@ -104,21 +107,32 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
 
             setFileType(pkg.metadata.fileType);
             setFileName(pkg.metadata.fileName);
-            setDownloadBlob(decryptedBlob);
+            // setDownloadBlob(decryptedBlob); // We might not need this for bundle, or we download the whole json
 
-            if (pkg.metadata.fileType.startsWith('text/')) {
-                const text = await decryptedBlob.text();
-                setDecryptedText(text);
+            if (pkg.metadata.fileName === 'vault_bundle.json') {
+                // Handle Bundle
+                const bundleText = await decryptedBlob.text();
+                const bundle = JSON.parse(bundleText);
+                setBundleItems(bundle.items);
+                setDownloadBlob(decryptedBlob); // Allow downloading the raw bundle json too
             } else {
-                const url = URL.createObjectURL(decryptedBlob);
-                setMediaUrl(url);
+                setDownloadBlob(decryptedBlob);
+                if (pkg.metadata.fileType.startsWith('text/')) {
+                    const text = await decryptedBlob.text();
+                    setDecryptedText(text);
+                } else {
+                    const url = URL.createObjectURL(decryptedBlob);
+                    setMediaUrl(url);
+                }
             }
 
             setIsDecrypting(false);
 
             // Delay before showing content - let safe animation play
             setTimeout(() => {
-                if (pkg.metadata.fileType.startsWith('text/')) {
+                if (pkg.metadata.fileName === 'vault_bundle.json') {
+                    setRevealState('assets');
+                } else if (pkg.metadata.fileType.startsWith('text/')) {
                     setRevealState('message'); // Show typewriter for text
                 } else {
                     setRevealState('assets'); // Go directly to assets for media
@@ -410,15 +424,26 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
                                     </div>
                                 </motion.div>
 
-                                {/* Asset Card */}
-                                <AssetCard
-                                    fileName={fileName}
-                                    fileType={fileType}
-                                    onDownload={downloadFile}
-                                    index={0}
-                                >
-                                    {renderContentPreview()}
-                                </AssetCard>
+                                {/* Content Display */}
+                                {bundleItems ? (
+                                    <div className="bg-dark-900/50 rounded-xl p-4 border border-dark-700 mb-6 max-h-[400px] overflow-auto">
+                                        <VaultContentEditor
+                                            items={bundleItems}
+                                            onItemsChange={() => { }}
+                                            readOnly={true}
+                                        />
+                                    </div>
+                                ) : (
+                                    /* Asset Card (Legacy Single File) */
+                                    <AssetCard
+                                        fileName={fileName}
+                                        fileType={fileType}
+                                        onDownload={downloadFile}
+                                        index={0}
+                                    >
+                                        {renderContentPreview()}
+                                    </AssetCard>
+                                )}
 
                                 {/* Vault Closed Success */}
                                 {vaultClosed && (
@@ -472,8 +497,8 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
                             </motion.div>
                         )}
                     </AnimatePresence>
-                </div>
-            </motion.div>
-        </div>
+                </div >
+            </motion.div >
+        </div >
     );
 }

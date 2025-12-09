@@ -12,7 +12,13 @@ import TunnelLayout from '@/components/layout/TunnelLayout';
 import WalletButton from '@/components/wallet/WalletButton';
 
 export interface VaultFormData {
-    // Step 1: File
+    // Vault Name (10.1)
+    vaultName: string;
+
+    // 10.2: Bundle items (multi-media)
+    bundleItems: import('@/types/vaultBundle').VaultItem[];
+
+    // Step 1: File (legacy single-file mode)
     file: File | null;
     encryptedBlob: Blob | null;
     aesKeyBase64: string;
@@ -44,13 +50,15 @@ export default function CreateVaultPage() {
     // Start at Step 0 (Templates)
     const [currentStep, setCurrentStep] = useState(0);
     const [formData, setFormData] = useState<VaultFormData>({
+        vaultName: '',
+        bundleItems: [], // 10.2
         file: null,
         encryptedBlob: null,
         aesKeyBase64: '',
-        encryptionMode: 'wallet', // Default to wallet mode (no password needed)
+        encryptionMode: 'wallet',
         recipientAddress: '',
         recipientEmail: '',
-        timeInterval: 30 * 24 * 60 * 60, // 30 days default
+        timeInterval: 30 * 24 * 60 * 60,
     });
 
     const updateFormData = useCallback((updates: Partial<VaultFormData>) => {

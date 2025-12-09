@@ -10,6 +10,7 @@ interface EditVaultModalProps {
         publicKey: PublicKey;
         recipient: PublicKey;
         timeInterval: BN;
+        name?: string; // 10.1
     };
     onClose: () => void;
     onSuccess: () => void;
@@ -30,6 +31,7 @@ const EditVaultModal: FC<EditVaultModalProps> = ({ vault, onClose, onSuccess }) 
 
     const [recipientAddress, setRecipientAddress] = useState(vault.recipient.toBase58());
     const [timeInterval, setTimeInterval] = useState(vault.timeInterval.toNumber());
+    const [vaultName, setVaultName] = useState(vault.name || ''); // 10.1
     const [status, setStatus] = useState<'idle' | 'updating' | 'success' | 'error'>('idle');
     const [error, setError] = useState<string | null>(null);
 
@@ -88,11 +90,13 @@ const EditVaultModal: FC<EditVaultModalProps> = ({ vault, onClose, onSuccess }) 
             // Determine what changed
             const recipientChanged = recipientAddress !== vault.recipient.toBase58();
             const intervalChanged = timeInterval !== vault.timeInterval.toNumber();
+            const nameChanged = vaultName !== (vault.name || '');
 
             await (program.methods as any)
                 .updateVault(
                     recipientChanged ? recipientPubkey : null,
-                    intervalChanged ? new BN(timeInterval) : null
+                    intervalChanged ? new BN(timeInterval) : null,
+                    nameChanged ? vaultName : null // 10.1: Rename
                 )
                 .accounts({
                     vault: vault.publicKey,
@@ -132,6 +136,21 @@ const EditVaultModal: FC<EditVaultModalProps> = ({ vault, onClose, onSuccess }) 
                 ) : (
                     <>
                         <div className="space-y-4 mb-6">
+                            {/* Vault Name - 10.1 */}
+                            <div>
+                                <label className="block text-xs font-medium text-dark-300 mb-1">
+                                    Vault Name
+                                </label>
+                                <input
+                                    type="text"
+                                    value={vaultName}
+                                    onChange={(e) => setVaultName(e.target.value)}
+                                    maxLength={32}
+                                    className="w-full bg-dark-900 border border-dark-600 rounded-lg px-4 py-3 text-white"
+                                    placeholder="My Vault"
+                                />
+                            </div>
+
                             {/* Recipient Address */}
                             <div>
                                 <label className="block text-xs font-medium text-dark-300 mb-1">
