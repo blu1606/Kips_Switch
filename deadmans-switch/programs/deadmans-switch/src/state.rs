@@ -41,11 +41,20 @@ pub struct Vault {
 
     /// Human-readable vault name
     pub name: String,
+
+    /// Amount of SOL locked for vesting (lamports)
+    pub locked_lamports: u64,
+
+    /// SPL token mint address (None if no tokens locked)
+    pub token_mint: Option<Pubkey>,
+
+    /// Amount of SPL tokens locked
+    pub locked_tokens: u64,
 }
 
 impl Vault {
     /// Calculate the space needed for a Vault account.
-    /// 8 (discriminator) + 32 + 32 + (4+64) + (4+128) + 8 + 8 + 1 + 8 + 1 + 33 + 8 + (4+32) = 375 bytes
+    /// Previous: 383 bytes + 33 (token_mint Option<Pubkey>) + 8 (locked_tokens) = 424 bytes
     pub const SPACE: usize = 8 
         + 32                          // owner
         + 32                          // recipient
@@ -58,5 +67,8 @@ impl Vault {
         + 1                           // bump
         + 33                          // delegate (Option<Pubkey>)
         + 8                           // bounty_lamports
-        + (4 + MAX_VAULT_NAME_LEN);   // name
+        + (4 + MAX_VAULT_NAME_LEN)    // name
+        + 8                           // locked_lamports
+        + 33                          // token_mint (Option<Pubkey>)
+        + 8;                          // locked_tokens
 }

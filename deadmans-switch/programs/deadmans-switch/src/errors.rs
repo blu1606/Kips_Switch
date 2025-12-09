@@ -33,4 +33,25 @@ pub enum VaultError {
 
     #[msg("Vault name exceeds maximum length of 32 characters")]
     NameTooLong,
+
+    #[msg("Only the designated recipient can perform this action")]
+    NotRecipient,
+
+    #[msg("Vault has not been released yet")]
+    NotReleased,
+
+    #[msg("No SOL locked in vault")]
+    NoLockedSol,
+
+    #[msg("Tokens already locked in vault")]
+    TokensAlreadyLocked,
+
+    #[msg("No tokens locked in vault")]
+    NoTokensLocked,
+
+    #[msg("Invalid token mint")]
+    InvalidMint,
+
+    #[msg("Tokens already claimed")]
+    TokensAlreadyClaimed,
 }

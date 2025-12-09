@@ -32,6 +32,7 @@ impl<'info> InitializeVault<'info> {
         time_interval: i64,
         bounty_lamports: u64,
         name: String,
+        locked_lamports: u64,
         bump: u8,
     ) -> Result<()> {
         require!(
@@ -60,9 +61,16 @@ impl<'info> InitializeVault<'info> {
         vault.delegate = None;
         vault.bounty_lamports = bounty_lamports;
         vault.name = name.clone();
+        vault.locked_lamports = locked_lamports;
+        vault.token_mint = None;      // T.2: No tokens locked initially
+        vault.locked_tokens = 0;      // T.2: Tokens locked via separate instruction
 
-        // Transfer bounty from owner to vault PDA
-        if bounty_lamports > 0 {
+        // Transfer bounty + locked SOL from owner to vault PDA
+        let total_transfer = bounty_lamports
+            .checked_add(locked_lamports)
+            .ok_or(VaultError::Overflow)?;
+            
+        if total_transfer > 0 {
             anchor_lang::system_program::transfer(
                 CpiContext::new(
                     self.system_program.to_account_info(),
@@ -71,7 +79,7 @@ impl<'info> InitializeVault<'info> {
                         to: vault.to_account_info(),
                     },
                 ),
-                bounty_lamports,
+                total_transfer,
             )?;
         }
 
@@ -79,7 +87,9 @@ impl<'info> InitializeVault<'info> {
         msg!("Vault Seed: {}", seed);
         msg!("Recipient: {}", vault.recipient);
         msg!("Bounty: {} lamports", bounty_lamports);
+        msg!("Locked SOL: {} lamports", locked_lamports);
 
         Ok(())
     }
 }
+

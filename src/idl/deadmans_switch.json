@@ -39,6 +39,38 @@
       "args": []
     },
     {
+      "name": "claim_sol",
+      "docs": [
+        "Claim locked SOL from a released vault."
+      ],
+      "discriminator": [
+        139,
+        113,
+        179,
+        189,
+        190,
+        30,
+        132,
+        195
+      ],
+      "accounts": [
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "recipient",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "close_vault",
       "docs": [
         "Close the vault and reclaim rent back to owner."
@@ -149,6 +181,10 @@
         {
           "name": "name",
           "type": "string"
+        },
+        {
+          "name": "locked_lamports",
+          "type": "u64"
         }
       ]
     },
@@ -405,6 +441,21 @@
       "code": 6009,
       "name": "NameTooLong",
       "msg": "Vault name exceeds maximum length of 32 characters"
+    },
+    {
+      "code": 6010,
+      "name": "NotRecipient",
+      "msg": "Only the designated recipient can perform this action"
+    },
+    {
+      "code": 6011,
+      "name": "NotReleased",
+      "msg": "Vault has not been released yet"
+    },
+    {
+      "code": 6012,
+      "name": "NoLockedSol",
+      "msg": "No SOL locked in vault"
     }
   ],
   "types": [
@@ -501,6 +552,13 @@
               "Human-readable vault name"
             ],
             "type": "string"
+          },
+          {
+            "name": "locked_lamports",
+            "docs": [
+              "Amount of SOL locked for vesting (lamports)"
+            ],
+            "type": "u64"
           }
         ]
       }

@@ -84,7 +84,10 @@
   - [x] StepConfirm bundle encryption
   - [x] Claim page bundle display
 - [ ] 10.3 Content Versioning (Pending)
-- [ ] 10.4 Token Locking (Pending)
+- [ ] 10.4 Token Vesting → [Spec Ready](./token-vesting/_overview.md)
+  - [ ] T.1 Lock Native SOL
+  - [ ] T.2 Lock SPL Tokens
+  - [ ] T.3 Claim with Token Release
 
 ---
 

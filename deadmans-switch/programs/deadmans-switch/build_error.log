@@ -1,0 +1,500 @@
+    Checking deadmans-switch v0.1.0 (/home/blu1606/deadman-switch/deadmans-switch/programs/deadmans-switch)
+error: init_if_needed requires that anchor-lang be imported with the init-if-needed cargo feature enabled. Carefully read the init_if_needed docs before using this feature to make sure you know how to protect yourself against re-initialization attacks.
+  --> programs/deadmans-switch/src/instructions/lock_tokens.rs:36:9
+   |
+36 |         init_if_needed,
+   |         ^^^^^^^^^^^^^^
+
+error: init_if_needed requires that anchor-lang be imported with the init-if-needed cargo feature enabled. Carefully read the init_if_needed docs before using this feature to make sure you know how to protect yourself against re-initialization attacks.
+  --> programs/deadmans-switch/src/instructions/claim_tokens.rs:40:9
+   |
+40 |         init_if_needed,
+   |         ^^^^^^^^^^^^^^
+
+error[E0432]: unresolved import `crate`
+  --> programs/deadmans-switch/src/lib.rs:19:1
+   |
+19 | #[program]
+   | ^^^^^^^^^^ could not find `__client_accounts_lock_tokens` in the crate root
+   |
+   = note: this error originates in the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `custom-heap`
+  --> programs/deadmans-switch/src/lib.rs:19:1
+   |
+19 | #[program]
+   | ^^^^^^^^^^
+   |
+   = note: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+   = note: using a cfg inside a macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `$crate::custom_heap_default` crate for guidance on how handle this unexpected cfg
+   = help: the macro `$crate::custom_heap_default` may come from an old version of the `solana_program_entrypoint` crate, try updating your dependency with `cargo update -p solana_program_entrypoint`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: `#[warn(unexpected_cfgs)]` on by default
+   = note: this warning originates in the macro `$crate::custom_heap_default` which comes from the expansion of the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `solana`
+  --> programs/deadmans-switch/src/lib.rs:19:1
+   |
+19 | #[program]
+   | ^^^^^^^^^^
+   |
+   = note: expected values for `target_os` are: `aix`, `amdhsa`, `android`, `cuda`, `cygwin`, `dragonfly`, `emscripten`, `espidf`, `freebsd`, `fuchsia`, `haiku`, `hermit`, `horizon`, `hurd`, `illumos`, `ios`, `l4re`, `linux`, `lynxos178`, `macos`, `netbsd`, `none`, `nto`, `nuttx`, `openbsd`, `psp`, `psx`, `redox`, `rtems`, `solaris`, `solid_asp3`, `teeos`, `trusty`, `tvos`, and `uefi` and 9 more
+   = note: using a cfg inside a macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `$crate::custom_heap_default` crate for guidance on how handle this unexpected cfg
+   = help: the macro `$crate::custom_heap_default` may come from an old version of the `solana_program_entrypoint` crate, try updating your dependency with `cargo update -p solana_program_entrypoint`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: this warning originates in the macro `$crate::custom_heap_default` which comes from the expansion of the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `custom-panic`
+  --> programs/deadmans-switch/src/lib.rs:19:1
+   |
+19 | #[program]
+   | ^^^^^^^^^^
+   |
+   = note: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+   = note: using a cfg inside a macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `$crate::custom_panic_default` crate for guidance on how handle this unexpected cfg
+   = help: the macro `$crate::custom_panic_default` may come from an old version of the `solana_program_entrypoint` crate, try updating your dependency with `cargo update -p solana_program_entrypoint`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: this warning originates in the macro `$crate::custom_panic_default` which comes from the expansion of the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `solana`
+  --> programs/deadmans-switch/src/lib.rs:19:1
+   |
+19 | #[program]
+   | ^^^^^^^^^^
+   |
+   = note: expected values for `target_os` are: `aix`, `amdhsa`, `android`, `cuda`, `cygwin`, `dragonfly`, `emscripten`, `espidf`, `freebsd`, `fuchsia`, `haiku`, `hermit`, `horizon`, `hurd`, `illumos`, `ios`, `l4re`, `linux`, `lynxos178`, `macos`, `netbsd`, `none`, `nto`, `nuttx`, `openbsd`, `psp`, `psx`, `redox`, `rtems`, `solaris`, `solid_asp3`, `teeos`, `trusty`, `tvos`, and `uefi` and 9 more
+   = note: using a cfg inside a macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `$crate::custom_panic_default` crate for guidance on how handle this unexpected cfg
+   = help: the macro `$crate::custom_panic_default` may come from an old version of the `solana_program_entrypoint` crate, try updating your dependency with `cargo update -p solana_program_entrypoint`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: this warning originates in the macro `$crate::custom_panic_default` which comes from the expansion of the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `anchor-debug`
+ --> programs/deadmans-switch/src/instructions/initialize_vault.rs:6:10
+  |
+6 | #[derive(Accounts)]
+  |          ^^^^^^^^
+  |
+  = note: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+  = note: using a cfg inside a derive macro will use the cfgs from the destination crate and not the ones from the defining crate
+  = help: try referring to `Accounts` crate for guidance on how handle this unexpected cfg
+  = help: the derive macro `Accounts` may come from an old version of the `anchor_derive_accounts` crate, try updating your dependency with `cargo update -p anchor_derive_accounts`
+  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+  = note: this warning originates in the derive macro `Accounts` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `anchor-debug`
+ --> programs/deadmans-switch/src/instructions/ping.rs:7:10
+  |
+7 | #[derive(Accounts)]
+  |          ^^^^^^^^
+  |
+  = note: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+  = note: using a cfg inside a derive macro will use the cfgs from the destination crate and not the ones from the defining crate
+  = help: try referring to `Accounts` crate for guidance on how handle this unexpected cfg
+  = help: the derive macro `Accounts` may come from an old version of the `anchor_derive_accounts` crate, try updating your dependency with `cargo update -p anchor_derive_accounts`
+  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+  = note: this warning originates in the derive macro `Accounts` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `anchor-debug`
+ --> programs/deadmans-switch/src/instructions/set_delegate.rs:6:10
+  |
+6 | #[derive(Accounts)]
+  |          ^^^^^^^^
+  |
+  = note: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+  = note: using a cfg inside a derive macro will use the cfgs from the destination crate and not the ones from the defining crate
+  = help: try referring to `Accounts` crate for guidance on how handle this unexpected cfg
+  = help: the derive macro `Accounts` may come from an old version of the `anchor_derive_accounts` crate, try updating your dependency with `cargo update -p anchor_derive_accounts`
+  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+  = note: this warning originates in the derive macro `Accounts` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `anchor-debug`
+ --> programs/deadmans-switch/src/instructions/trigger_release.rs:6:10
+  |
+6 | #[derive(Accounts)]
+  |          ^^^^^^^^
+  |
+  = note: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+  = note: using a cfg inside a derive macro will use the cfgs from the destination crate and not the ones from the defining crate
+  = help: try referring to `Accounts` crate for guidance on how handle this unexpected cfg
+  = help: the derive macro `Accounts` may come from an old version of the `anchor_derive_accounts` crate, try updating your dependency with `cargo update -p anchor_derive_accounts`
+  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+  = note: this warning originates in the derive macro `Accounts` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `anchor-debug`
+ --> programs/deadmans-switch/src/instructions/top_up_bounty.rs:6:10
+  |
+6 | #[derive(Accounts)]
+  |          ^^^^^^^^
+  |
+  = note: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+  = note: using a cfg inside a derive macro will use the cfgs from the destination crate and not the ones from the defining crate
+  = help: try referring to `Accounts` crate for guidance on how handle this unexpected cfg
+  = help: the derive macro `Accounts` may come from an old version of the `anchor_derive_accounts` crate, try updating your dependency with `cargo update -p anchor_derive_accounts`
+  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+  = note: this warning originates in the derive macro `Accounts` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `anchor-debug`
+ --> programs/deadmans-switch/src/instructions/update_vault.rs:6:10
+  |
+6 | #[derive(Accounts)]
+  |          ^^^^^^^^
+  |
+  = note: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+  = note: using a cfg inside a derive macro will use the cfgs from the destination crate and not the ones from the defining crate
+  = help: try referring to `Accounts` crate for guidance on how handle this unexpected cfg
+  = help: the derive macro `Accounts` may come from an old version of the `anchor_derive_accounts` crate, try updating your dependency with `cargo update -p anchor_derive_accounts`
+  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+  = note: this warning originates in the derive macro `Accounts` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `anchor-debug`
+ --> programs/deadmans-switch/src/instructions/close_vault.rs:6:10
+  |
+6 | #[derive(Accounts)]
+  |          ^^^^^^^^
+  |
+  = note: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+  = note: using a cfg inside a derive macro will use the cfgs from the destination crate and not the ones from the defining crate
+  = help: try referring to `Accounts` crate for guidance on how handle this unexpected cfg
+  = help: the derive macro `Accounts` may come from an old version of the `anchor_derive_accounts` crate, try updating your dependency with `cargo update -p anchor_derive_accounts`
+  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+  = note: this warning originates in the derive macro `Accounts` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `anchor-debug`
+ --> programs/deadmans-switch/src/instructions/claim_and_close.rs:6:10
+  |
+6 | #[derive(Accounts)]
+  |          ^^^^^^^^
+  |
+  = note: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+  = note: using a cfg inside a derive macro will use the cfgs from the destination crate and not the ones from the defining crate
+  = help: try referring to `Accounts` crate for guidance on how handle this unexpected cfg
+  = help: the derive macro `Accounts` may come from an old version of the `anchor_derive_accounts` crate, try updating your dependency with `cargo update -p anchor_derive_accounts`
+  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+  = note: this warning originates in the derive macro `Accounts` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `anchor-debug`
+ --> programs/deadmans-switch/src/instructions/claim_sol.rs:6:10
+  |
+6 | #[derive(Accounts)]
+  |          ^^^^^^^^
+  |
+  = note: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+  = note: using a cfg inside a derive macro will use the cfgs from the destination crate and not the ones from the defining crate
+  = help: try referring to `Accounts` crate for guidance on how handle this unexpected cfg
+  = help: the derive macro `Accounts` may come from an old version of the `anchor_derive_accounts` crate, try updating your dependency with `cargo update -p anchor_derive_accounts`
+  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+  = note: this warning originates in the derive macro `Accounts` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unused import: `errors::*`
+ --> programs/deadmans-switch/src/instructions/claim_tokens.rs:8:27
+  |
+8 | use crate::{constants::*, errors::*, state::*};
+  |                           ^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unexpected `cfg` condition value: `anchor-debug`
+  --> programs/deadmans-switch/src/lib.rs:19:1
+   |
+19 | #[program]
+   | ^^^^^^^^^^
+   |
+   = note: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+   = note: using a cfg inside a attribute macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `program` crate for guidance on how handle this unexpected cfg
+   = help: the attribute macro `program` may come from an old version of the `anchor_attribute_program` crate, try updating your dependency with `cargo update -p anchor_attribute_program`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: this warning originates in the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition value: `anchor-debug`
+  --> programs/deadmans-switch/src/lib.rs:19:1
+   |
+19 | #[program]
+   | ^^^^^^^^^^
+   |
+   = note: expected values for `feature` are: `cpi`, `default`, `idl-build`, `no-entrypoint`, `no-idl`, and `no-log-ix-name`
+   = note: using a cfg inside a derive macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `Accounts` crate for guidance on how handle this unexpected cfg
+   = help: the derive macro `Accounts` may come from an old version of the `anchor_derive_accounts` crate, try updating your dependency with `cargo update -p anchor_derive_accounts`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: this warning originates in the derive macro `Accounts` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `lock_tokens::LockTokens<'_>: Bumps` is not satisfied
+  --> programs/deadmans-switch/src/lib.rs:84:29
+   |
+84 |     pub fn lock_tokens(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
+   |                             ^^^^^^^^^^^^^^^^^^^ the trait `Bumps` is not implemented for `lock_tokens::LockTokens<'_>`
+   |
+   = help: the following other types implement trait `Bumps`:
+             CreateNonceAccount<'info>
+             CreateNonceAccountWithSeed<'info>
+             DefaultAccountStateInitialize<'info>
+             DefaultAccountStateUpdate<'info>
+             GroupMemberPointerInitialize<'info>
+             GroupMemberPointerUpdate<'info>
+             GroupPointerInitialize<'info>
+             GroupPointerUpdate<'info>
+           and 88 others
+note: required by a bound in `anchor_lang::context::Context`
+  --> /home/blu1606/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anchor-lang-0.31.1/src/context.rs:24:42
+   |
+24 | pub struct Context<'a, 'b, 'c, 'info, T: Bumps> {
+   |                                          ^^^^^ required by this bound in `Context`
+
+error[E0277]: the trait bound `claim_tokens::ClaimTokens<'_>: Bumps` is not satisfied
+  --> programs/deadmans-switch/src/lib.rs:89:30
+   |
+89 |     pub fn claim_tokens(ctx: Context<ClaimTokens>) -> Result<()> {
+   |                              ^^^^^^^^^^^^^^^^^^^^ the trait `Bumps` is not implemented for `claim_tokens::ClaimTokens<'_>`
+   |
+   = help: the following other types implement trait `Bumps`:
+             CreateNonceAccount<'info>
+             CreateNonceAccountWithSeed<'info>
+             DefaultAccountStateInitialize<'info>
+             DefaultAccountStateUpdate<'info>
+             GroupMemberPointerInitialize<'info>
+             GroupMemberPointerUpdate<'info>
+             GroupPointerInitialize<'info>
+             GroupPointerUpdate<'info>
+           and 88 others
+note: required by a bound in `anchor_lang::context::Context`
+  --> /home/blu1606/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anchor-lang-0.31.1/src/context.rs:24:42
+   |
+24 | pub struct Context<'a, 'b, 'c, 'info, T: Bumps> {
+   |                                          ^^^^^ required by this bound in `Context`
+
+warning: use of deprecated method `anchor_lang::prelude::AccountInfo::<'a>::realloc`: Use AccountInfo::resize() instead
+  --> programs/deadmans-switch/src/lib.rs:19:1
+   |
+19 | #[program]
+   | ^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+   = note: this warning originates in the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `lock_tokens::LockTokens<'_>: Bumps` is not satisfied
+  --> programs/deadmans-switch/src/lib.rs:84:37
+   |
+84 |     pub fn lock_tokens(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
+   |                                     ^^^^^^^^^^ the trait `Bumps` is not implemented for `lock_tokens::LockTokens<'_>`
+   |
+   = help: the following other types implement trait `Bumps`:
+             CreateNonceAccount<'info>
+             CreateNonceAccountWithSeed<'info>
+             DefaultAccountStateInitialize<'info>
+             DefaultAccountStateUpdate<'info>
+             GroupMemberPointerInitialize<'info>
+             GroupMemberPointerUpdate<'info>
+             GroupPointerInitialize<'info>
+             GroupPointerUpdate<'info>
+           and 88 others
+
+error[E0277]: the trait bound `lock_tokens::LockTokens<'_>: Bumps` is not satisfied
+  --> programs/deadmans-switch/src/lib.rs:19:1
+   |
+19 | #[program]
+   | ^^^^^^^^^^ the trait `Bumps` is not implemented for `lock_tokens::LockTokens<'_>`
+   |
+   = help: the following other types implement trait `Bumps`:
+             CreateNonceAccount<'info>
+             CreateNonceAccountWithSeed<'info>
+             DefaultAccountStateInitialize<'info>
+             DefaultAccountStateUpdate<'info>
+             GroupMemberPointerInitialize<'info>
+             GroupMemberPointerUpdate<'info>
+             GroupPointerInitialize<'info>
+             GroupPointerUpdate<'info>
+           and 88 others
+   = note: this error originates in the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0599]: no function or associated item named `try_accounts` found for struct `lock_tokens::LockTokens` in the current scope
+   --> programs/deadmans-switch/src/lib.rs:19:1
+    |
+19  | #[program]
+    | ^^^^^^^^^^ function or associated item not found in `lock_tokens::LockTokens<'_>`
+    |
+   ::: programs/deadmans-switch/src/instructions/lock_tokens.rs:11:1
+    |
+11  | pub struct LockTokens<'info> {
+    | ---------------------------- function or associated item `try_accounts` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `try_accounts`, perhaps you need to implement it:
+            candidate #1: `anchor_lang::Accounts`
+help: there is a method `try_into` with a similar name, but with different arguments
+   --> /home/blu1606/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/convert/mod.rs:617:5
+    |
+617 |     fn try_into(self) -> Result<T, Self::Error>;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = note: this error originates in the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `lock_tokens::LockTokens<'_>: anchor_lang::Accounts<'_, _>` is not satisfied
+  --> programs/deadmans-switch/src/lib.rs:19:1
+   |
+19 | #[program]
+   | ^^^^^^^^^^ the trait `anchor_lang::Accounts<'_, _>` is not implemented for `lock_tokens::LockTokens<'_>`
+   |
+   = help: the following other types implement trait `anchor_lang::Accounts<'info, B>`:
+             `AccountLoader<'info, T>` implements `anchor_lang::Accounts<'info, B>`
+             `Box<T>` implements `anchor_lang::Accounts<'info, B>`
+             `CreateNonceAccount<'info>` implements `anchor_lang::Accounts<'info, CreateNonceAccountBumps>`
+             `CreateNonceAccountWithSeed<'info>` implements `anchor_lang::Accounts<'info, CreateNonceAccountWithSeedBumps>`
+             `DefaultAccountStateInitialize<'info>` implements `anchor_lang::Accounts<'info, DefaultAccountStateInitializeBumps>`
+             `DefaultAccountStateUpdate<'info>` implements `anchor_lang::Accounts<'info, DefaultAccountStateUpdateBumps>`
+             `GroupMemberPointerInitialize<'info>` implements `anchor_lang::Accounts<'info, GroupMemberPointerInitializeBumps>`
+             `GroupMemberPointerUpdate<'info>` implements `anchor_lang::Accounts<'info, GroupMemberPointerUpdateBumps>`
+           and 101 others
+note: required by a bound in `anchor_lang::context::Context::<'a, 'b, 'c, 'info, T>::new`
+  --> /home/blu1606/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anchor-lang-0.31.1/src/context.rs:55:16
+   |
+55 |     T: Bumps + Accounts<'info, T::Bumps>,
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `Context::<'a, 'b, 'c, 'info, T>::new`
+56 | {
+57 |     pub fn new(
+   |            --- required by a bound in this associated function
+   = note: this error originates in the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `claim_tokens::ClaimTokens<'_>: Bumps` is not satisfied
+  --> programs/deadmans-switch/src/lib.rs:89:38
+   |
+89 |     pub fn claim_tokens(ctx: Context<ClaimTokens>) -> Result<()> {
+   |                                      ^^^^^^^^^^^ the trait `Bumps` is not implemented for `claim_tokens::ClaimTokens<'_>`
+   |
+   = help: the following other types implement trait `Bumps`:
+             CreateNonceAccount<'info>
+             CreateNonceAccountWithSeed<'info>
+             DefaultAccountStateInitialize<'info>
+             DefaultAccountStateUpdate<'info>
+             GroupMemberPointerInitialize<'info>
+             GroupMemberPointerUpdate<'info>
+             GroupPointerInitialize<'info>
+             GroupPointerUpdate<'info>
+           and 88 others
+
+error[E0277]: the trait bound `claim_tokens::ClaimTokens<'_>: Bumps` is not satisfied
+  --> programs/deadmans-switch/src/lib.rs:19:1
+   |
+19 | #[program]
+   | ^^^^^^^^^^ the trait `Bumps` is not implemented for `claim_tokens::ClaimTokens<'_>`
+   |
+   = help: the following other types implement trait `Bumps`:
+             CreateNonceAccount<'info>
+             CreateNonceAccountWithSeed<'info>
+             DefaultAccountStateInitialize<'info>
+             DefaultAccountStateUpdate<'info>
+             GroupMemberPointerInitialize<'info>
+             GroupMemberPointerUpdate<'info>
+             GroupPointerInitialize<'info>
+             GroupPointerUpdate<'info>
+           and 88 others
+   = note: this error originates in the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0599]: no function or associated item named `try_accounts` found for struct `claim_tokens::ClaimTokens` in the current scope
+   --> programs/deadmans-switch/src/lib.rs:19:1
+    |
+19  | #[program]
+    | ^^^^^^^^^^ function or associated item not found in `claim_tokens::ClaimTokens<'_>`
+    |
+   ::: programs/deadmans-switch/src/instructions/claim_tokens.rs:11:1
+    |
+11  | pub struct ClaimTokens<'info> {
+    | ----------------------------- function or associated item `try_accounts` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `try_accounts`, perhaps you need to implement it:
+            candidate #1: `anchor_lang::Accounts`
+help: there is a method `try_into` with a similar name, but with different arguments
+   --> /home/blu1606/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/convert/mod.rs:617:5
+    |
+617 |     fn try_into(self) -> Result<T, Self::Error>;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = note: this error originates in the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `claim_tokens::ClaimTokens<'_>: anchor_lang::Accounts<'_, _>` is not satisfied
+  --> programs/deadmans-switch/src/lib.rs:19:1
+   |
+19 | #[program]
+   | ^^^^^^^^^^ the trait `anchor_lang::Accounts<'_, _>` is not implemented for `claim_tokens::ClaimTokens<'_>`
+   |
+   = help: the following other types implement trait `anchor_lang::Accounts<'info, B>`:
+             `AccountLoader<'info, T>` implements `anchor_lang::Accounts<'info, B>`
+             `Box<T>` implements `anchor_lang::Accounts<'info, B>`
+             `CreateNonceAccount<'info>` implements `anchor_lang::Accounts<'info, CreateNonceAccountBumps>`
+             `CreateNonceAccountWithSeed<'info>` implements `anchor_lang::Accounts<'info, CreateNonceAccountWithSeedBumps>`
+             `DefaultAccountStateInitialize<'info>` implements `anchor_lang::Accounts<'info, DefaultAccountStateInitializeBumps>`
+             `DefaultAccountStateUpdate<'info>` implements `anchor_lang::Accounts<'info, DefaultAccountStateUpdateBumps>`
+             `GroupMemberPointerInitialize<'info>` implements `anchor_lang::Accounts<'info, GroupMemberPointerInitializeBumps>`
+             `GroupMemberPointerUpdate<'info>` implements `anchor_lang::Accounts<'info, GroupMemberPointerUpdateBumps>`
+           and 101 others
+note: required by a bound in `anchor_lang::context::Context::<'a, 'b, 'c, 'info, T>::new`
+  --> /home/blu1606/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anchor-lang-0.31.1/src/context.rs:55:16
+   |
+55 |     T: Bumps + Accounts<'info, T::Bumps>,
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `Context::<'a, 'b, 'c, 'info, T>::new`
+56 | {
+57 |     pub fn new(
+   |            --- required by a bound in this associated function
+   = note: this error originates in the attribute macro `program` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `lock_tokens::LockTokens<'_>: Bumps` is not satisfied in `anchor_lang::context::Context<'_, '_, '_, '_, lock_tokens::LockTokens<'_>>`
+  --> programs/deadmans-switch/src/lib.rs:84:29
+   |
+84 |     pub fn lock_tokens(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
+   |                             ^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+   |
+   = help: within `anchor_lang::context::Context<'_, '_, '_, '_, lock_tokens::LockTokens<'_>>`, the trait `Bumps` is not implemented for `lock_tokens::LockTokens<'_>`
+   = help: the following other types implement trait `Bumps`:
+             CreateNonceAccount<'info>
+             CreateNonceAccountWithSeed<'info>
+             DefaultAccountStateInitialize<'info>
+             DefaultAccountStateUpdate<'info>
+             GroupMemberPointerInitialize<'info>
+             GroupMemberPointerUpdate<'info>
+             GroupPointerInitialize<'info>
+             GroupPointerUpdate<'info>
+           and 88 others
+note: required because it appears within the type `anchor_lang::context::Context<'_, '_, '_, '_, lock_tokens::LockTokens<'_>>`
+  --> /home/blu1606/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anchor-lang-0.31.1/src/context.rs:24:12
+   |
+24 | pub struct Context<'a, 'b, 'c, 'info, T: Bumps> {
+   |            ^^^^^^^
+help: function arguments must have a statically known size, borrowed types always have a known size
+   |
+84 |     pub fn lock_tokens(ctx: &Context<LockTokens>, amount: u64) -> Result<()> {
+   |                             +
+
+error[E0277]: the trait bound `claim_tokens::ClaimTokens<'_>: Bumps` is not satisfied in `anchor_lang::context::Context<'_, '_, '_, '_, claim_tokens::ClaimTokens<'_>>`
+  --> programs/deadmans-switch/src/lib.rs:89:30
+   |
+89 |     pub fn claim_tokens(ctx: Context<ClaimTokens>) -> Result<()> {
+   |                              ^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+   |
+   = help: within `anchor_lang::context::Context<'_, '_, '_, '_, claim_tokens::ClaimTokens<'_>>`, the trait `Bumps` is not implemented for `claim_tokens::ClaimTokens<'_>`
+   = help: the following other types implement trait `Bumps`:
+             CreateNonceAccount<'info>
+             CreateNonceAccountWithSeed<'info>
+             DefaultAccountStateInitialize<'info>
+             DefaultAccountStateUpdate<'info>
+             GroupMemberPointerInitialize<'info>
+             GroupMemberPointerUpdate<'info>
+             GroupPointerInitialize<'info>
+             GroupPointerUpdate<'info>
+           and 88 others
+note: required because it appears within the type `anchor_lang::context::Context<'_, '_, '_, '_, claim_tokens::ClaimTokens<'_>>`
+  --> /home/blu1606/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anchor-lang-0.31.1/src/context.rs:24:12
+   |
+24 | pub struct Context<'a, 'b, 'c, 'info, T: Bumps> {
+   |            ^^^^^^^
+help: function arguments must have a statically known size, borrowed types always have a known size
+   |
+89 |     pub fn claim_tokens(ctx: &Context<ClaimTokens>) -> Result<()> {
+   |                              +
+
+Some errors have detailed explanations: E0277, E0432, E0599.
+For more information about an error, try `rustc --explain E0277`.
+warning: `deadmans-switch` (lib) generated 22 warnings (5 duplicates)
+error: could not compile `deadmans-switch` (lib) due to 15 previous errors; 22 warnings emitted

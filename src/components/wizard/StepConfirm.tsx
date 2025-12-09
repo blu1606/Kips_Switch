@@ -160,7 +160,8 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
                     recipientPubkey,
                     new BN(formData.timeInterval),
                     new BN(1_000_000), // 0.001 SOL bounty (~2x gas fee)
-                    vaultName || 'Untitled Vault' // 10.1: Vault name
+                    vaultName || 'Untitled Vault', // 10.1: Vault name
+                    new BN(0) // T.1: locked_lamports (default 0, UI coming soon)
                 )
                 .accounts({
                     vault: vaultPda,

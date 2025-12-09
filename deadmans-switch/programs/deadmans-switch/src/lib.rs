@@ -30,8 +30,9 @@ pub mod deadmans_switch {
         time_interval: i64,
         bounty_lamports: u64,
         name: String,
+        locked_lamports: u64,
     ) -> Result<()> {
-        ctx.accounts.handler(seed, ipfs_cid, encrypted_key, recipient, time_interval, bounty_lamports, name, ctx.bumps.vault)
+        ctx.accounts.handler(seed, ipfs_cid, encrypted_key, recipient, time_interval, bounty_lamports, name, locked_lamports, ctx.bumps.vault)
     }
 
     /// Ping (check-in) to reset the dead man's switch timer.
@@ -71,6 +72,21 @@ pub mod deadmans_switch {
 
     /// Claim the vault contents and close it.
     pub fn claim_and_close(ctx: Context<ClaimAndClose>) -> Result<()> {
+        ctx.accounts.handler()
+    }
+
+    /// Claim locked SOL from a released vault.
+    pub fn claim_sol(ctx: Context<ClaimSol>) -> Result<()> {
+        ctx.accounts.handler()
+    }
+
+    /// Lock SPL tokens into a vault for vesting.
+    pub fn lock_tokens(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
+        ctx.accounts.handler(amount)
+    }
+
+    /// Claim locked SPL tokens from a released vault.
+    pub fn claim_tokens(ctx: Context<ClaimTokens>) -> Result<()> {
         ctx.accounts.handler()
     }
 }
