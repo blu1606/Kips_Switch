@@ -144,6 +144,15 @@ pub mod deadmans_switch {
         // 7.1: Pay bounty to hunter
         let bounty = vault.bounty_lamports;
         if bounty > 0 {
+            // Check rent exemption before transferring bounty
+            let vault_lamports = vault.to_account_info().lamports();
+            let rent = Rent::get()?;
+            let min_rent = rent.minimum_balance(Vault::SPACE);
+            require!(
+                vault_lamports.saturating_sub(bounty) >= min_rent,
+                VaultError::InsufficientBalance
+            );
+
             **vault.to_account_info().try_borrow_mut_lamports()? -= bounty;
             **ctx.accounts.hunter.to_account_info().try_borrow_mut_lamports()? += bounty;
             vault.bounty_lamports = 0;
@@ -153,6 +162,33 @@ pub mod deadmans_switch {
         vault.is_released = true;
 
         msg!("Vault released! Recipient {} can now claim.", vault.recipient);
+
+        Ok(())
+    }
+
+    /// Add more SOL to the bounty pool.
+    /// Only the owner can top up.
+    pub fn top_up_bounty(ctx: Context<TopUpBounty>, amount: u64) -> Result<()> {
+        let vault = &mut ctx.accounts.vault;
+
+        require!(!vault.is_released, VaultError::AlreadyReleased);
+        require!(amount > 0, VaultError::InvalidAmount);
+
+        // Transfer SOL from owner to vault
+        anchor_lang::system_program::transfer(
+            CpiContext::new(
+                ctx.accounts.system_program.to_account_info(),
+                anchor_lang::system_program::Transfer {
+                    from: ctx.accounts.owner.to_account_info(),
+                    to: vault.to_account_info(),
+                },
+            ),
+            amount,
+        )?;
+
+        vault.bounty_lamports = vault.bounty_lamports.checked_add(amount).ok_or(VaultError::Overflow)?;
+
+        msg!("Bounty topped up by {} lamports. Total: {}", amount, vault.bounty_lamports);
 
         Ok(())
     }
@@ -258,7 +294,6 @@ pub struct SetDelegate<'info> {
     pub owner: Signer<'info>,
 }
 
-/// 7.1: Updated TriggerRelease - now includes hunter signer to receive bounty
 #[derive(Accounts)]
 pub struct TriggerRelease<'info> {
     #[account(mut)]
@@ -267,8 +302,7 @@ pub struct TriggerRelease<'info> {
     /// The hunter who triggers the release and receives the bounty
     #[account(mut)]
     pub hunter: Signer<'info>,
-
-    pub system_program: Program<'info, System>,
+    // Note: system_program removed - not needed for direct lamport manipulation
 }
 
 #[derive(Accounts)]
@@ -280,6 +314,20 @@ pub struct UpdateVault<'info> {
     pub vault: Account<'info, Vault>,
 
     pub owner: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct TopUpBounty<'info> {
+    #[account(
+        mut,
+        has_one = owner @ VaultError::Unauthorized
+    )]
+    pub vault: Account<'info, Vault>,
+
+    #[account(mut)]
+    pub owner: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -383,4 +431,10 @@ pub enum VaultError {
 
     #[msg("Arithmetic overflow occurred")]
     Overflow,
+
+    #[msg("Amount must be greater than 0")]
+    InvalidAmount,
+
+    #[msg("Insufficient balance to maintain rent exemption")]
+    InsufficientBalance,
 }

@@ -1,7 +1,9 @@
 'use client';
 
 import { FC, useState } from 'react';
-import { PublicKey } from '@solana/web3.js';
+import { PublicKey, SystemProgram } from '@solana/web3.js';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
 
 interface TopUpBountyModalProps {
     vaultAddress: PublicKey;
@@ -14,13 +16,45 @@ const TopUpBountyModal: FC<TopUpBountyModalProps> = ({ vaultAddress, currentBoun
     const [amount, setAmount] = useState<number>(0.05);
     const [status, setStatus] = useState<'idle' | 'processing' | 'success'>('idle');
 
+    const { publicKey, signTransaction, signAllTransactions } = useWallet();
+    const { connection } = useConnection();
+
     const handleTopUp = async () => {
+        if (!publicKey || !signTransaction || !signAllTransactions) {
+            return;
+        }
+
         setStatus('processing');
-        // Mock transaction for now
-        setTimeout(() => {
+
+        try {
+            const provider = new AnchorProvider(
+                connection,
+                { publicKey, signTransaction, signAllTransactions },
+                { commitment: 'confirmed' }
+            );
+
+            const idl = await import('@/idl/deadmans_switch.json');
+            const program = new Program(idl as any, provider);
+
+            // Convert SOL amount to lamports
+            const lamports = new BN(amount * 1_000_000_000);
+
+            await (program.methods as any)
+                .topUpBounty(lamports)
+                .accounts({
+                    vault: vaultAddress,
+                    owner: publicKey,
+                    systemProgram: SystemProgram.programId,
+                })
+                .rpc();
+
             setStatus('success');
             setTimeout(onSuccess, 1500);
-        }, 1500);
+        } catch (error) {
+            console.error("Top Up failed", error);
+            setStatus('idle'); // Or error state
+            alert("Failed to top up bounty. Check console.");
+        }
     };
 
     return (
@@ -56,8 +90,8 @@ const TopUpBountyModal: FC<TopUpBountyModalProps> = ({ vaultAddress, currentBoun
                                             key={val}
                                             onClick={() => setAmount(val)}
                                             className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${amount === val
-                                                    ? 'bg-primary-600 text-white'
-                                                    : 'bg-dark-700 text-dark-300 hover:bg-dark-600'
+                                                ? 'bg-primary-600 text-white'
+                                                : 'bg-dark-700 text-dark-300 hover:bg-dark-600'
                                                 }`}
                                         >
                                             +{val}

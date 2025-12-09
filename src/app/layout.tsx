@@ -18,9 +18,9 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-jetbrains-mono' });
 
 export const metadata: Metadata = {
-    title: "Deadman's Switch | Digital Legacy Protocol",
-    description: 'A decentralized dead man\'s switch protocol on Solana for secure digital inheritance.',
-    keywords: ['solana', 'dead man switch', 'digital legacy', 'crypto inheritance', 'web3'],
+    title: "Deadman's Switch | Digital Inheritance & Crypto Emergency Protocol",
+    description: 'Secure your digital legacy. Automated crypto inheritance, whistleblower insurance, and self-custody backup on Solana. Decentralized and immutable.',
+    keywords: ['solana', 'digital legacy', 'crypto inheritance', 'dead man switch', 'whistleblower switch', 'key recovery', 'self-custody backup', 'web3 estate planning'],
     manifest: '/manifest.json',
 };
 

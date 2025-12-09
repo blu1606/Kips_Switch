@@ -41,6 +41,15 @@ const EditVaultModal: FC<EditVaultModalProps> = ({ vault, onClose, onSuccess }) 
         }
         return false;
     });
+
+    // Magic Link Logic
+    const [magicLinkEnabled, setMagicLinkEnabled] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem(`magic_link_${vault.publicKey.toBase58()}`) === 'true';
+        }
+        return false;
+    });
+    const [updatingMagicLink, setUpdatingMagicLink] = useState(false);
     const [emergencyEmail, setEmergencyEmail] = useState(() => {
         if (typeof window !== 'undefined') {
             return localStorage.getItem(`duress_email_${vault.publicKey.toBase58()}`) || '';
@@ -210,19 +219,65 @@ const EditVaultModal: FC<EditVaultModalProps> = ({ vault, onClose, onSuccess }) 
                                     </p>
                                 </div>
                                 <button
-                                    onClick={() => {
-                                        // Mock toggle for UI demo
-                                        const newVal = !localStorage.getItem(`magic_link_${vault.publicKey.toBase58()}`);
-                                        if (newVal) {
-                                            localStorage.setItem(`magic_link_${vault.publicKey.toBase58()}`, 'true');
-                                        } else {
-                                            localStorage.removeItem(`magic_link_${vault.publicKey.toBase58()}`);
+                                    onClick={async () => {
+                                        if (updatingMagicLink) return;
+                                        // Ensure wallet is connected
+                                        if (!publicKey || !signTransaction || !signAllTransactions) {
+                                            setError("Please connect your wallet first");
+                                            return;
                                         }
-                                        // Force re-render would be needed here in real app, but this is just a quick action
+
+                                        setUpdatingMagicLink(true);
+
+                                        try {
+                                            const provider = new AnchorProvider(
+                                                connection,
+                                                // @ts-ignore - we checked for existence above
+                                                { publicKey, signTransaction, signAllTransactions },
+                                                { commitment: 'confirmed' }
+                                            );
+                                            const idl = await import('@/idl/deadmans_switch.json');
+                                            const program = new Program(idl as any, provider);
+
+                                            const newEnabled = !magicLinkEnabled;
+
+                                            // Fetch platform key if enabling
+                                            let delegateKey = null;
+                                            if (newEnabled) {
+                                                try {
+                                                    const res = await fetch('/api/system/delegate-key');
+                                                    if (!res.ok) throw new Error("Failed to fetch server key");
+                                                    const data = await res.json();
+                                                    delegateKey = new PublicKey(data.publicKey);
+                                                } catch (err) {
+                                                    console.error("Delegate fetch error", err);
+                                                    throw new Error("Could not find Deadman Switch server key");
+                                                }
+                                            }
+
+                                            // 1. Update Delegate on Contract
+                                            await (program.methods as any)
+                                                .setDelegate(delegateKey) // setDelegate accepts Option<Pubkey> so null is fine
+                                                .accounts({
+                                                    vault: vault.publicKey,
+                                                    owner: publicKey,
+                                                })
+                                                .rpc();
+
+                                            // 2. Update Local State & Storage
+                                            setMagicLinkEnabled(newEnabled);
+                                            localStorage.setItem(`magic_link_${vault.publicKey.toBase58()}`, String(newEnabled));
+
+                                        } catch (e: any) {
+                                            console.error("Failed to toggle magic link", e);
+                                            setError("Failed to update Magic Link: " + e.message);
+                                        } finally {
+                                            setUpdatingMagicLink(false);
+                                        }
                                     }}
-                                    className={`w-12 h-6 rounded-full transition-colors relative bg-dark-600`}
+                                    className={`w-12 h-6 rounded-full transition-colors relative ${magicLinkEnabled ? 'bg-primary-600' : 'bg-dark-600'}`}
                                 >
-                                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform left-1`} />
+                                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${magicLinkEnabled ? 'left-7' : 'left-1'}`} />
                                 </button>
                             </div>
                         </div>
