@@ -25,6 +25,7 @@ pub mod deadmans_switch {
 
     /// Initialize a new vault with dead man's switch functionality.
     /// Creates a PDA owned by the caller to store vault data.
+    /// 7.1: Now accepts optional bounty_lamports for Bounty Hunter Protocol.
     pub fn initialize_vault(
         ctx: Context<InitializeVault>,
         seed: u64,
@@ -32,6 +33,7 @@ pub mod deadmans_switch {
         encrypted_key: String,
         recipient: Pubkey,
         time_interval: i64,
+        bounty_lamports: u64, // 7.1: Optional bounty for hunter
     ) -> Result<()> {
         require!(
             ipfs_cid.len() <= MAX_IPFS_CID_LEN,
@@ -56,10 +58,26 @@ pub mod deadmans_switch {
         vault.vault_seed = seed;
         vault.bump = ctx.bumps.vault;
         vault.delegate = None; // 6.1: Initialize with no delegate
+        vault.bounty_lamports = bounty_lamports; // 7.1: Store bounty amount
+
+        // 7.1: Transfer bounty from owner to vault PDA
+        if bounty_lamports > 0 {
+            anchor_lang::system_program::transfer(
+                CpiContext::new(
+                    ctx.accounts.system_program.to_account_info(),
+                    anchor_lang::system_program::Transfer {
+                        from: ctx.accounts.owner.to_account_info(),
+                        to: vault.to_account_info(),
+                    },
+                ),
+                bounty_lamports,
+            )?;
+        }
 
         msg!("Vault initialized for owner: {}", vault.owner);
         msg!("Vault Seed: {}", seed);
         msg!("Recipient: {}", vault.recipient);
+        msg!("Bounty: {} lamports", bounty_lamports);
 
         Ok(())
     }
@@ -108,7 +126,8 @@ pub mod deadmans_switch {
     }
 
     /// Trigger the release of vault contents if the timer has expired.
-    /// Anyone can call this, but it only succeeds if the vault has expired.
+    /// Anyone can call this (permissionless), but it only succeeds if the vault has expired.
+    /// 7.1: Hunter who triggers receives the bounty as reward.
     pub fn trigger_release(ctx: Context<TriggerRelease>) -> Result<()> {
         let vault = &mut ctx.accounts.vault;
         let clock = Clock::get()?;
@@ -121,6 +140,15 @@ pub mod deadmans_switch {
             .ok_or(VaultError::Overflow)?;
 
         require!(clock.unix_timestamp > expiry_time, VaultError::NotExpired);
+
+        // 7.1: Pay bounty to hunter
+        let bounty = vault.bounty_lamports;
+        if bounty > 0 {
+            **vault.to_account_info().try_borrow_mut_lamports()? -= bounty;
+            **ctx.accounts.hunter.to_account_info().try_borrow_mut_lamports()? += bounty;
+            vault.bounty_lamports = 0;
+            msg!("Bounty of {} lamports paid to hunter: {}", bounty, ctx.accounts.hunter.key());
+        }
 
         vault.is_released = true;
 
@@ -230,10 +258,17 @@ pub struct SetDelegate<'info> {
     pub owner: Signer<'info>,
 }
 
+/// 7.1: Updated TriggerRelease - now includes hunter signer to receive bounty
 #[derive(Accounts)]
 pub struct TriggerRelease<'info> {
     #[account(mut)]
     pub vault: Account<'info, Vault>,
+
+    /// The hunter who triggers the release and receives the bounty
+    #[account(mut)]
+    pub hunter: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -309,13 +344,17 @@ pub struct Vault {
     /// 6.1: Delegated wallet that can only call ping()
     /// This allows a "hot wallet" to check-in without having full control
     pub delegate: Option<Pubkey>, // 1 + 32 = 33 bytes
+
+    /// 7.1: Bounty for the hunter who triggers release after expiry
+    pub bounty_lamports: u64, // 8 bytes
 }
 
 impl Vault {
     /// Calculate the space needed for a Vault account
     /// Original: 298 bytes
-    /// New with delegate: 298 + 33 (Option<Pubkey>) = 331 bytes
-    pub const SPACE: usize = 8 + 32 + 32 + (4 + MAX_IPFS_CID_LEN) + (4 + MAX_ENCRYPTED_KEY_LEN) + 8 + 8 + 1 + 8 + 1 + 33;
+    /// With delegate: 298 + 33 (Option<Pubkey>) = 331 bytes
+    /// With bounty: 331 + 8 (u64) = 339 bytes
+    pub const SPACE: usize = 8 + 32 + 32 + (4 + MAX_IPFS_CID_LEN) + (4 + MAX_ENCRYPTED_KEY_LEN) + 8 + 8 + 1 + 8 + 1 + 33 + 8;
 }
 
 // ============================================================================

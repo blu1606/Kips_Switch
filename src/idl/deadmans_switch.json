@@ -76,7 +76,8 @@
       "name": "initialize_vault",
       "docs": [
         "Initialize a new vault with dead man's switch functionality.",
-        "Creates a PDA owned by the caller to store vault data."
+        "Creates a PDA owned by the caller to store vault data.",
+        "7.1: Now accepts optional bounty_lamports for Bounty Hunter Protocol."
       ],
       "discriminator": [
         48,
@@ -145,6 +146,10 @@
         {
           "name": "time_interval",
           "type": "i64"
+        },
+        {
+          "name": "bounty_lamports",
+          "type": "u64"
         }
       ]
     },
@@ -152,7 +157,7 @@
       "name": "ping",
       "docs": [
         "Ping (check-in) to reset the dead man's switch timer.",
-        "Only the vault owner can call this instruction."
+        "Owner OR delegate can call this instruction (6.1 Frictionless Check-in)."
       ],
       "discriminator": [
         173,
@@ -170,6 +175,38 @@
           "writable": true
         },
         {
+          "name": "signer",
+          "docs": [
+            "The signer - can be owner or delegate (validated in instruction)"
+          ],
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "set_delegate",
+      "docs": [
+        "Set or clear the delegate wallet that can ping on owner's behalf.",
+        "Only the vault owner can call this instruction.",
+        "The delegate can ONLY ping - they cannot update vault settings or close it."
+      ],
+      "discriminator": [
+        242,
+        30,
+        46,
+        76,
+        108,
+        235,
+        128,
+        181
+      ],
+      "accounts": [
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
           "name": "owner",
           "signer": true,
           "relations": [
@@ -177,13 +214,21 @@
           ]
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "new_delegate",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
     },
     {
       "name": "trigger_release",
       "docs": [
         "Trigger the release of vault contents if the timer has expired.",
-        "Anyone can call this, but it only succeeds if the vault has expired."
+        "Anyone can call this (permissionless), but it only succeeds if the vault has expired.",
+        "7.1: Hunter who triggers receives the bounty as reward."
       ],
       "discriminator": [
         101,
@@ -199,6 +244,18 @@
         {
           "name": "vault",
           "writable": true
+        },
+        {
+          "name": "hunter",
+          "docs": [
+            "The hunter who triggers the release and receives the bounty"
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": []
@@ -267,7 +324,7 @@
     {
       "code": 6000,
       "name": "Unauthorized",
-      "msg": "Only the vault owner can perform this action"
+      "msg": "Only the vault owner or delegate can perform this action"
     },
     {
       "code": 6001,
@@ -368,6 +425,23 @@
               "PDA bump seed"
             ],
             "type": "u8"
+          },
+          {
+            "name": "delegate",
+            "docs": [
+              "6.1: Delegated wallet that can only call ping()",
+              "This allows a \"hot wallet\" to check-in without having full control"
+            ],
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "bounty_lamports",
+            "docs": [
+              "7.1: Bounty for the hunter who triggers release after expiry"
+            ],
+            "type": "u64"
           }
         ]
       }

@@ -109,7 +109,8 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
                     cid,
                     keyInfo,
                     recipientPubkey,
-                    new BN(formData.timeInterval)
+                    new BN(formData.timeInterval),
+                    new BN(10_000_000) // 7.1: 0.01 SOL bounty in lamports
                 )
                 .accounts({
                     vault: vaultPda,
@@ -214,6 +215,38 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
                             <p className="font-medium">{formatInterval(formData.timeInterval)}</p>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* Bounty Hunter (Optional) */}
+            <div className="bg-dark-800 rounded-lg p-4 border border-dark-700 space-y-4">
+                <h3 className="font-semibold text-white flex items-center gap-2">
+                    <span className="text-xl">⚡</span>
+                    Release Bounty (Optional)
+                </h3>
+                <p className="text-sm text-dark-400">
+                    Tip the network to auto-release your vault when the timer expires.
+                    Higher bounty = faster, guaranteed trigger.
+                </p>
+
+                <div className="bg-dark-900/50 rounded-lg p-4 border border-dark-600/50">
+                    <div className="flex items-center justify-between mb-4">
+                        <span className="text-sm font-medium text-white">Bounty Amount</span>
+                        <span className="font-mono text-primary-400 text-lg">0.01 SOL</span>
+                    </div>
+
+                    <div className="relative h-2 bg-dark-700 rounded-full mb-2">
+                        <div className="absolute left-0 top-0 h-full bg-primary-500 rounded-full w-[10%]" />
+                    </div>
+
+                    <div className="flex justify-between text-xs text-dark-500 font-mono">
+                        <span>0.01 SOL</span>
+                        <span>0.10 SOL</span>
+                    </div>
+
+                    <p className="text-xs text-dark-400 mt-3 text-center">
+                        ≈ $2.00 (Covers gas + small reward for hunter)
+                    </p>
                 </div>
             </div>
 

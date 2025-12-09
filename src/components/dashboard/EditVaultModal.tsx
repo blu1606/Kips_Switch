@@ -196,6 +196,37 @@ const EditVaultModal: FC<EditVaultModalProps> = ({ vault, onClose, onSuccess }) 
                             </div>
                         </div>
 
+                        {/* Magic Link Section */}
+                        <div className="border-t border-dark-700 pt-6 mb-6">
+                            <h3 className="text-sm font-bold text-dark-300 mb-4 uppercase tracking-wider">
+                                Frictionless Check-in
+                            </h3>
+
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <label className="text-sm text-white block">Email Magic Link</label>
+                                    <p className="text-xs text-dark-400 max-w-[200px] mt-1">
+                                        Allow checking in directly from your email reminder. No wallet connection required.
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        // Mock toggle for UI demo
+                                        const newVal = !localStorage.getItem(`magic_link_${vault.publicKey.toBase58()}`);
+                                        if (newVal) {
+                                            localStorage.setItem(`magic_link_${vault.publicKey.toBase58()}`, 'true');
+                                        } else {
+                                            localStorage.removeItem(`magic_link_${vault.publicKey.toBase58()}`);
+                                        }
+                                        // Force re-render would be needed here in real app, but this is just a quick action
+                                    }}
+                                    className={`w-12 h-6 rounded-full transition-colors relative bg-dark-600`}
+                                >
+                                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform left-1`} />
+                                </button>
+                            </div>
+                        </div>
+
                         <div className="flex gap-3">
                             <button
                                 onClick={onClose}

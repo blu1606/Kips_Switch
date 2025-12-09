@@ -10,6 +10,7 @@ import AliveIndicator from '@/components/dashboard/AliveIndicator';
 import VaultHealthShield from '@/components/dashboard/VaultHealthShield';
 import HoldCheckInButton from '@/components/dashboard/HoldCheckInButton';
 import KeeperSpirit from '@/components/dashboard/KeeperSpirit';
+import TopUpBountyModal from '@/components/dashboard/TopUpBountyModal';
 
 export default function DashboardPage() {
     const { connected } = useWallet();
@@ -20,6 +21,7 @@ export default function DashboardPage() {
     const [pingSuccess, setPingSuccess] = useState<string | null>(null);
     const [editingVault, setEditingVault] = useState<VaultData | null>(null);
     const [delegatingVault, setDelegatingVault] = useState<VaultData | null>(null);
+    const [bountyVault, setBountyVault] = useState<VaultData | null>(null);
 
     const handlePing = async (vault: VaultData) => {
         setPingingVault(vault.publicKey.toBase58());
@@ -143,6 +145,23 @@ export default function DashboardPage() {
                                                 </div>
                                             </div>
 
+                                            {/* Bounty Display */}
+                                            <div className="flex items-center justify-between bg-dark-900/50 p-3 rounded-lg border border-dark-700/50 mb-6">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xl">⚡</span>
+                                                    <div>
+                                                        <div className="text-[10px] text-dark-500 uppercase tracking-wider">Bounty</div>
+                                                        <div className="font-mono text-white">0.02 SOL</div>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => setBountyVault(vault)}
+                                                    className="px-3 py-1.5 bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 text-xs rounded-lg transition-colors border border-primary-500/20"
+                                                >
+                                                    Top Up
+                                                </button>
+                                            </div>
+
                                             {/* Action Area */}
                                             {!vault.isReleased && (
                                                 <div className="flex flex-col md:flex-row gap-3">
@@ -222,6 +241,18 @@ export default function DashboardPage() {
                     onClose={() => setDelegatingVault(null)}
                     onSuccess={() => {
                         setDelegatingVault(null);
+                        refetch();
+                    }}
+                />
+            )}
+
+            {bountyVault && (
+                <TopUpBountyModal
+                    vaultAddress={bountyVault.publicKey}
+                    currentBounty={0.02} // Mock value
+                    onClose={() => setBountyVault(null)}
+                    onSuccess={() => {
+                        setBountyVault(null);
                         refetch();
                     }}
                 />

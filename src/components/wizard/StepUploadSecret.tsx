@@ -312,8 +312,8 @@ const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext }) => {
                                     <button
                                         onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
                                         className={`relative w-20 h-20 rounded-full mx-auto flex items-center justify-center transition-all ${isRecording
-                                                ? 'bg-red-500 shadow-lg shadow-red-500/50'
-                                                : 'bg-gradient-to-br from-primary-500 to-secondary-500 hover:shadow-lg hover:shadow-primary-500/30'
+                                            ? 'bg-red-500 shadow-lg shadow-red-500/50'
+                                            : 'bg-gradient-to-br from-primary-500 to-secondary-500 hover:shadow-lg hover:shadow-primary-500/30'
                                             }`}
                                     >
                                         {isRecording ? (
@@ -339,8 +339,8 @@ const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext }) => {
                                             <div
                                                 key={i}
                                                 className={`w-1 rounded-full transition-all duration-150 ${isRecording
-                                                        ? 'bg-red-400/80 animate-pulse'
-                                                        : 'bg-dark-600 h-1'
+                                                    ? 'bg-red-400/80 animate-pulse'
+                                                    : 'bg-dark-600 h-1'
                                                     }`}
                                                 style={isRecording ? {
                                                     height: `${12 + Math.random() * 20}px`,

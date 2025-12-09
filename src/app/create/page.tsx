@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useCallback } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useRouter } from 'next/navigation';
@@ -7,6 +5,8 @@ import StepUploadSecret from '@/components/wizard/StepUploadSecret';
 import StepSetRecipient from '@/components/wizard/StepSetRecipient';
 import StepSetInterval from '@/components/wizard/StepSetInterval';
 import StepConfirm from '@/components/wizard/StepConfirm';
+import TemplateSelector from '@/components/wizard/TemplateSelector';
+import TunnelLayout from '@/components/layout/TunnelLayout';
 import WalletButton from '@/components/wallet/WalletButton';
 
 export interface VaultFormData {
@@ -28,6 +28,7 @@ export interface VaultFormData {
 }
 
 const STEPS = [
+    { id: 0, name: 'Template', description: 'Choose Mode' },
     { id: 1, name: 'Upload Secret', description: 'Encrypt your file' },
     { id: 2, name: 'Set Recipient', description: 'Who can claim' },
     { id: 3, name: 'Set Interval', description: 'Check-in period' },
@@ -38,7 +39,8 @@ export default function CreateVaultPage() {
     const { connected } = useWallet();
     const router = useRouter();
 
-    const [currentStep, setCurrentStep] = useState(1);
+    // Start at Step 0 (Templates)
+    const [currentStep, setCurrentStep] = useState(0);
     const [formData, setFormData] = useState<VaultFormData>({
         file: null,
         encryptedBlob: null,
@@ -58,117 +60,90 @@ export default function CreateVaultPage() {
     }, []);
 
     const prevStep = useCallback(() => {
-        setCurrentStep((prev) => Math.max(prev - 1, 1));
+        setCurrentStep((prev) => Math.max(prev - 1, 0));
     }, []);
+
+    // Handle Template Selection (Step 0)
+    const handleTemplateSelect = useCallback((intervalSeconds: number) => {
+        if (intervalSeconds > 0) {
+            updateFormData({ timeInterval: intervalSeconds });
+        }
+        nextStep();
+    }, [nextStep, updateFormData]);
 
     const handleSuccess = useCallback(() => {
         router.push('/dashboard');
     }, [router]);
 
+    const handleExit = useCallback(() => {
+        if (window.confirm('Are you sure you want to exit? Your progress will be lost.')) {
+            router.push('/dashboard');
+        }
+    }, [router]);
+
     if (!connected) {
         return (
-            <main className="min-h-screen flex items-center justify-center">
-                <div className="card text-center max-w-md">
+            <main className="min-h-screen flex items-center justify-center bg-dark-900">
+                <div className="card text-center max-w-md border-dark-700 bg-dark-800">
+                    <div className="w-16 h-16 bg-dark-700 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg className="w-8 h-8 text-dark-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                    </div>
                     <h2 className="text-2xl font-bold mb-4">Connect Wallet</h2>
-                    <p className="text-dark-400 mb-6">
-                        Please connect your wallet to create a vault.
+                    <p className="text-dark-400 mb-8">
+                        Connect your wallet to start creating a secure vault protocol.
                     </p>
-                    <WalletButton />
+                    <div className="flex justify-center">
+                        <WalletButton />
+                    </div>
                 </div>
             </main>
         );
     }
 
     return (
-        <main className="min-h-screen pt-20 pb-10 px-4">
-            <div className="max-w-2xl mx-auto">
-                {/* Header */}
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold mb-2">Create Your Vault</h1>
-                    <p className="text-dark-400">
-                        Secure your digital legacy in 4 simple steps
-                    </p>
-                </div>
-
-                {/* Progress Steps */}
-                <div className="mb-8">
-                    <div className="flex items-center justify-between">
-                        {STEPS.map((step, index) => (
-                            <div key={step.id} className="flex items-center">
-                                <div className="flex flex-col items-center">
-                                    <div
-                                        className={`
-                      w-10 h-10 rounded-full flex items-center justify-center font-semibold
-                      transition-all duration-300
-                      ${currentStep > step.id
-                                                ? 'bg-green-500 text-white'
-                                                : currentStep === step.id
-                                                    ? 'bg-primary-600 text-white ring-4 ring-primary-600/30'
-                                                    : 'bg-dark-700 text-dark-400'
-                                            }
-                    `}
-                                    >
-                                        {currentStep > step.id ? (
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        ) : (
-                                            step.id
-                                        )}
-                                    </div>
-                                    <span className={`text-xs mt-2 ${currentStep >= step.id ? 'text-white' : 'text-dark-500'}`}>
-                                        {step.name}
-                                    </span>
-                                </div>
-                                {index < STEPS.length - 1 && (
-                                    <div
-                                        className={`
-                      h-0.5 w-12 sm:w-20 mx-2
-                      ${currentStep > step.id ? 'bg-green-500' : 'bg-dark-700'}
-                    `}
-                                    />
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Step Content */}
-                <div className="card min-h-[400px]">
-                    <div key={currentStep} className="animate-fade-in">
-                        {currentStep === 1 && (
-                            <StepUploadSecret
-                                formData={formData}
-                                updateFormData={updateFormData}
-                                onNext={nextStep}
-                            />
-                        )}
-                        {currentStep === 2 && (
-                            <StepSetRecipient
-                                formData={formData}
-                                updateFormData={updateFormData}
-                                onNext={nextStep}
-                                onBack={prevStep}
-                            />
-                        )}
-                        {currentStep === 3 && (
-                            <StepSetInterval
-                                formData={formData}
-                                updateFormData={updateFormData}
-                                onNext={nextStep}
-                                onBack={prevStep}
-                            />
-                        )}
-                        {currentStep === 4 && (
-                            <StepConfirm
-                                formData={formData}
-                                onBack={prevStep}
-                                onSuccess={handleSuccess}
-                            />
-                        )}
-                    </div>
-                </div>
+        <TunnelLayout
+            title={STEPS.find(s => s.id === currentStep)?.name || 'Create Vault'}
+            step={currentStep}
+            totalSteps={4}
+            onExit={handleExit}
+        >
+            <div className="animate-fade-in">
+                {currentStep === 0 && (
+                    <TemplateSelector onSelect={handleTemplateSelect} />
+                )}
+                {currentStep === 1 && (
+                    <StepUploadSecret
+                        formData={formData}
+                        updateFormData={updateFormData}
+                        onNext={nextStep}
+                    />
+                )}
+                {currentStep === 2 && (
+                    <StepSetRecipient
+                        formData={formData}
+                        updateFormData={updateFormData}
+                        onNext={nextStep}
+                        onBack={prevStep}
+                    />
+                )}
+                {currentStep === 3 && (
+                    <StepSetInterval
+                        formData={formData}
+                        updateFormData={updateFormData}
+                        onNext={nextStep}
+                        onBack={prevStep}
+                    />
+                )}
+                {currentStep === 4 && (
+                    <StepConfirm
+                        formData={formData}
+                        onBack={prevStep}
+                        onSuccess={handleSuccess}
+                    />
+                )}
             </div>
-        </main>
+        </TunnelLayout>
     );
 }

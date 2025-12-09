@@ -33,10 +33,10 @@
 ## 🔄 In Progress
 
 ### Phase 6: Future Roadmap ~90%
-- [x] 6.1 Frictionless Check-in (~80%)
+- [x] 6.1 Frictionless Check-in ✅ Done
   - [x] Contract: delegate field + set_delegate
   - [x] UI: DelegateModal
-  - [ ] Deploy updated contract
+  - [x] Deploy updated contract
 - [x] 6.2 Cinematic Reveal ✅ Done
   - [x] RevealSequence, VaultSafe3D
   - [x] Typewriter effect
@@ -54,13 +54,14 @@
 > - UI/UX changes are subtle (Tamagotchi is small, Reveal is once-off). Needs more visual impact in v2.
 > - **Silent Alarm (Duress Mode):** Implementation is complex in real-world scenarios (hardware triggers, reliable location). Current MVP is "soft" security.
 
-### Phase 7: Decentralization ~35%
-- [ ] 7.1 Bounty Hunter
-  - [ ] Contract: bounty field + permissionless trigger
+### Phase 7: Decentralization ~60%
+- [x] 7.1 Bounty Hunter ✅ Done
+  - [x] Contract: bounty field + permissionless trigger
   - [ ] Gravedigger SDK (community bot script)
-  - [ ] UI: bounty slider
+  - [x] UI: bounty slider
 - [x] 7.2 Delegate Check-in ✅ Done
-- ~~7.3 Email Magic Link~~ → Deferred (Delegate is enough)
+- [ ] 7.3 Email Magic Link
+  - [x] UI: Settings toggle (Mock)
 
 ---
 
@@ -70,7 +71,7 @@
 - [x] 00-ux-deep-dive.md
 - [x] 01-smart-templates.md
 - [x] 02-guided-setup-flow.md
-- [ ] Implementation
+- [x] Implementation (Tunnel Layout + Templates)
 
 ### Brand Identity (Kip)
 - [x] 00-brand-philosophy.md
@@ -105,10 +106,10 @@
 | Phase 3: Claim | ✅ Done | 100% |
 | Phase 4: Automation | ⏳ Near | 90% |
 | Phase 6: Roadmap | ⏳ Near | 90% |
-| Phase 7: Decentralization | 🔄 Active | 35% |
+| Phase 7: Decentralization | 🔄 Active | 60% |
 | Phase 8: Growth | 📝 Spec | 15% |
 | Phase 9: AI | 📝 Spec | 10% |
-| Create Vault UX | 📝 Spec | 20% |
+| Create Vault UX | ✅ Done | 100% |
 | Brand Identity | 📝 Spec | 25% |
 
 ---
