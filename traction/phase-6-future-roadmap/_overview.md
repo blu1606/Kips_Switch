@@ -1,105 +1,113 @@
 # 🎯 Phase 6: Future Roadmap & Enhancements
 
-This document analyzes high-value feature ideas to enhance Deadman's Switch from a functional tool to an engaging, intelligent product.
+> **Updated:** 2025-12-09
 
-## 🗺️ Roadmap Overview
+## 📊 Progress Summary
 
-| Feature Area | Concept | Impact (Value) | Feasibility | Priority |
-|--------------|---------|----------------|-------------|----------|
-| **UX Improvement** | Frictionless Heartbeat | ⭐⭐⭐⭐⭐ (High) | 🟢 Easy/Medium | 1 |
-| **Experience** | Cinematic Legacy Reveal | ⭐⭐⭐⭐⭐ (High) | 🟢 Easy | 2 |
-| **Gamification** | The Tamagotchi Vault | ⭐⭐⭐⭐ (Med-High)| 🟡 Medium | 3 |
-| **Security** | The Council of Guardians | ⭐⭐⭐⭐⭐ (High) | 🔴 Hard | 4 |
-| **Safety** | Panic Button (Duress) | ⭐⭐⭐ (Med) | 🟡 Medium | 5 |
-
----
-
-## 🚀 1. The Frictionless Heartbeat (Optimized Check-in)
-**Problem:** Frequent check-ins are annoying. High friction = user churn = accidental release.
-
-### Solutions
-1.  **Solana Blinks (Actions):** check-in directly from Twitter/X.
-    *   *Feasibility:* Medium. Requires integration with Dialect/Blink protocol.
-    *   *Benefit:* Extremely low friction. Virality.
-2.  **"Snooze" via Email (Magic Link):**
-    *   *Mechanism:* Click link in email -> Server verifies token -> Server pays gas to call `ping` (Gasless for user).
-    *   *Feasibility:* Easy. We already have Supabase + Resend.
-    *   *Benefit:* No wallet connection needed. Life-saver when traveling/no ledger.
-3.  **Delegated Check-in:**
-    *   *Mechanism:* Assign a "hot wallet" (mobile) that only has permission to `ping` (not `update` or `close`).
-    *   *Feasibility:* Easy (Smart Contract tweak).
-    *   *Benefit:* Security of Cold Storage + Convenience of Hot Wallet.
-
-**Recommendation:** Implement **Delegated Check-in** first (Contract change), then **Snooze via Email** (Web2 hybrid).
+| Priority | Feature | Feasibility | Completion | Status |
+|----------|---------|-------------|------------|--------|
+| **1** | Frictionless Check-in | 🟢 Easy | **~80%** | Contract + UI done |
+| **2** | Cinematic Reveal | 🟢 Easy | **~70%** | Core components built |
+| **3** | Tamagotchi Vault | 🟢 **Simplified** | **~60%** | Frontend states only |
+| **4** | Council of Guardians | 🔴 Hard | **0%** | Deferred to v2 |
+| **5** | Silent Alarm (NEW) | 🟢 Easy | **0%** | Spec ready |
 
 ---
 
-## 🎬 2. Cinematic Legacy Reveal (Emotional UX)
-**Problem:** Downloading a ZIP file is cold and transactional. Inheritance is emotional.
+## ✅ 6.1 Frictionless Check-in (~80%)
 
-### Concept structure
-1.  **The Lock (Pending):** 3D Safe/Countdown (Spline/Three.js) instead of static text.
-2.  **The Reveal (Unlocked):**
-    *   Black screen fade-out.
-    *   "Final Message" (Video/Text) plays automatically.
-    *   Assets appear slowly with ethereal sound/animation.
+**Goal:** Reduce check-in friction to near zero.
 
-**Implementation:**
-- Pure Frontend (React + Framer Motion).
-- No contract changes.
-- **High Value / Low Effort.**
+### Done ✅
+- [x] Contract: `delegate: Option<Pubkey>` in Vault struct
+- [x] Contract: `set_delegate()` instruction
+- [x] Contract: `ping()` accepts owner OR delegate
+- [x] UI: `DelegateModal.tsx` - set/clear delegate
 
----
+### Remaining
+- [ ] Deploy updated contract to devnet
 
-## 👾 3. The Tamagotchi Vault (Gamification)
-**Problem:** Check-in is a chore.
-**Solution:** Check-in = Feeding a digital pet.
-
-### Concept
-- **Mint:** Create Vault -> Mint "Spirit NFT".
-- **Dynamic Metadata:**
-    - `LastCheckIn < 24h`: Happy Spirit.
-    - `LastCheckIn > 7 days`: Sick Spirit.
-    - `Expired`: Stone/Ghost.
-- **Reward:** Longest streak = Evolved Spirit (Tradeable?).
-
-**Implementation:**
-- Requires Metaplex standard (Dynamic NFT).
-- Contract needs to emit events or NFT metadata update logic.
-- **Medium Effort.** Good for retention.
+### Deferred
+- Email Magic Link → Later (Delegate is enough for now)
+- Solana Blinks → v2
 
 ---
 
-## 🛡️ 4. The Council of Guardians (Social Recovery)
-**Problem:** Time-based trigger is brittle (coma, jail, lost internet).
+## ✅ 6.2 Cinematic Reveal (~70%)
 
-### Concept
-- **M-of-N Guardians:** Owner appoints 3 friends.
-- **Override:**
-    - If timer expires -> Guardians notified.
-    - Guardians vote "Confirm Death" -> Vault Opens.
-    - OR: Guardians vote "Lost Key" -> Rotates Owner Key.
+**Goal:** Transform claim into emotional ceremony.
 
-**Implementation:**
-- Complex Smart Contract logic (Multisig).
-- UI for Guardians to vote.
-- **High Effort / High Value.** Enterprise feature.
+### Done ✅
+- [x] `framer-motion` installed
+- [x] `RevealSequence.tsx` - state machine
+- [x] `VaultSafe3D.tsx` - 3D safe with mouse parallax
+- [x] `AssetCard.tsx` - glassmorphism cards
+- [x] `ClaimModal.tsx` - integrated flow
 
----
+### Remaining
+- [ ] Typewriter effect for final message
+- [ ] Polish transitions & timing
 
-## 🚨 5. Intelligent Vault extensions
-- **Panic Button:** "Fake Check-in" that looks valid but secretly burns the key or alerts emergency contacts.
-- **Social Recovery:** Restore access if owner key is lost (distinct from Guardian trigger).
+### Deferred
+- Sound effects → Optional, users often mute
 
 ---
 
-## 📋 Compliance & Execution Plan
+## 🟢 6.3 Tamagotchi Vault (~60%) - SIMPLIFIED
 
-We will adopt the **Traction** folder structure for these new phases.
+**Goal:** Visual feedback for vault health. **No NFT complexity.**
 
-- `traction/phase-6-future-roadmap/6.1-frictionless-checkin.md`
-- `traction/phase-6-future-roadmap/6.2-cinematic-reveal.md`
-- `traction/phase-6-future-roadmap/6.3-tamagotchi-vault.md`
-- `traction/phase-6-future-roadmap/6.4-council-guardians.md`
+### Done ✅
+- [x] `KeeperSpirit.tsx` - Kip component with 4 states
+- [x] Frontend state logic based on `days_since_last_checkin`
 
-We will start drafting detailed specs for **6.2 Cinematic Reveal** (Quick Win) and **6.1 Frictionless Check-in** (High Impact).
+### Simplified Approach
+```
+Instead of Dynamic NFT:
+- Dashboard shows Kip's mood based on timer
+- Happy (>50% time) → Neutral (25-50%) → Worried (<25%) → Ghost (released)
+- All frontend logic, no contract/NFT changes
+```
+
+### Remaining
+- [ ] Integrate Kip states into Dashboard
+- [ ] Show Kip face next to timer
+
+### Deferred
+- Dynamic NFT metadata → v2
+- On-chain streak → v2
+- Metaplex integration → v2
+
+---
+
+## ❌ 6.4 Council of Guardians - DEFERRED
+
+> **Status:** v2/Enterprise feature. Too complex for MVP.
+
+---
+
+## 🆕 6.5 Silent Alarm (Duress Mode)
+
+**Goal:** Panic button that looks like normal check-in.
+
+### Spec: [6.5-silent-alarm.md](./6.5-silent-alarm.md)
+
+### Summary
+- Hold button 5s instead of 2s → Triggers duress mode
+- Fake UI: "Check-in successful!"
+- Reality: No tx sent, SOS email to emergency contacts
+- **No contract changes** - Frontend + API only
+
+### Steps
+- [ ] Add duress detection to HoldCheckInButton
+- [ ] Create /api/alert/duress endpoint
+- [ ] Add emergency contacts in settings
+
+---
+
+## 🚀 Recommended Next Steps
+
+1. **6.1:** Deploy delegate changes to devnet
+2. **6.3:** Integrate Kip states into Dashboard (frontend only)
+3. **6.5:** Implement Silent Alarm (high USP, easy)
+4. **6.2:** Polish reveal (typewriter effect)
