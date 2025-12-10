@@ -47,7 +47,7 @@ export default function ProblemSection() {
                             viewport={{ once: true }}
                             className="text-4xl md:text-5xl font-bold mb-6 leading-tight"
                         >
-                            The <span className="text-red-400">Void</span> Takes Everything.
+                            Satoshi&apos;s coins are lost forever. <span className="text-red-400">Yours don&apos;t have to be.</span>
                         </motion.h2>
 
                         <p className="text-xl text-dark-300 mb-8 leading-relaxed">
@@ -57,7 +57,7 @@ export default function ProblemSection() {
                         <div className="space-y-4">
                             <div className="flex items-start gap-4">
                                 <div className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center mt-1 text-red-400">✕</div>
-                                <p className="text-dark-400">No backup for self-custody.</p>
+                                <p className="text-dark-400">Your wife doesn&apos;t have your private keys. She gets $0.</p>
                             </div>
                             <div className="flex items-start gap-4">
                                 <div className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center mt-1 text-red-400">✕</div>

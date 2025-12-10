@@ -5,26 +5,26 @@ import Image from 'next/image';
 
 const useCases = [
     {
-        title: "The Protector",
-        subtitle: "Crypto Inheritance",
-        image: "/assets/glass-shield.png",
-        desc: "Ensure your family inherits your portfolio without sharing private keys today. Assets transfer only when you're gone.",
+        title: "Lock",
+        subtitle: "Step 1: Setup",
+        image: "/assets/glass-lock.png",
+        desc: "Deposit your assets into a smart contract vault. Add your encrypted notes. Only you hold the decryption key initially.",
         color: "from-blue-500/20 to-cyan-500/20",
         glow: "shadow-blue-500/20"
     },
     {
-        title: "The Truth Teller",
-        subtitle: "Whistleblower Insurance",
+        title: "Live",
+        subtitle: "Step 2: Monitor",
         image: "/assets/glass-eye.png",
-        desc: "Protect yourself against silencing. Set a trigger to release sensitive information automatically if you don't check in.",
-        color: "from-amber-500/20 to-red-500/20",
+        desc: "Kip monitors your on-chain activity. Simply perform a transaction or check-in to reset the timer. No subscription fees.",
+        color: "from-amber-500/20 to-orange-500/20",
         glow: "shadow-amber-500/20"
     },
     {
-        title: "The Sovereign",
-        subtitle: "Self-Custody Backup",
+        title: "Legacy",
+        subtitle: "Step 3: Release",
         image: "/assets/glass-key.png",
-        desc: "A fail-safe for your fail-safes. If you lose access to your primary wallet, your backup wallet automatically claims control.",
+        desc: "If the timer hits zero, the switch triggers. Your private notes are decrypted and funds are sent to your beneficiary automatically.",
         color: "from-emerald-500/20 to-green-500/20",
         glow: "shadow-emerald-500/20"
     }
@@ -35,8 +35,8 @@ export default function UseCaseGrid() {
         <section className="py-24 px-4">
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">Built for Every Scenario</h2>
-                    <p className="text-dark-400">From family security to absolute sovereignty.</p>
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
+                    <p className="text-dark-400">Simple, secure, and 100% on-chain.</p>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-8">

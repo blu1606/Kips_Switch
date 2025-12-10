@@ -1,115 +1,245 @@
-import { useDemoVault } from '@/hooks/useDemoVault';
+'use client';
+
+import { motion } from 'framer-motion';
+import { AlertTriangle, CheckCircle, FastForward, FileText, Image, File, Lock, Unlock } from 'lucide-react';
+import { DemoState, UploadedFileInfo } from '@/hooks/useDemoVault';
+import confetti from 'canvas-confetti';
 import KipAvatar from '@/components/brand/KipAvatar';
-import { motion, AnimatePresence } from 'framer-motion';
+import HoldCheckInButton from '@/components/dashboard/HoldCheckInButton';
+import { useEffect, useState } from 'react';
 
-export default function DemoDashboard() {
-    const { vault, actions, state } = useDemoVault();
+interface DemoDashboardProps {
+    timer: number;
+    maxTime: number;
+    state: DemoState;
+    onCheckIn: () => void;
+    onFastForward: () => void;
+    uploadedFile: UploadedFileInfo | null;
+}
+
+export default function DemoDashboard({
+    timer,
+    maxTime,
+    state,
+    onCheckIn,
+    onFastForward,
+    uploadedFile
+}: DemoDashboardProps) {
+    const progress = (timer / maxTime) * 100;
+    const isDying = state === 'DYING' || (state === 'LIVE' && timer < 5);
     const isReleased = state === 'RELEASED';
+    const [confettiFired, setConfettiFired] = useState(false);
 
-    return (
-        <div className="w-full max-w-2xl">
-            {/* Success Modal (Released) */}
-            <AnimatePresence>
-                {isReleased && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-                    >
-                        <div className="bg-dark-900 border border-green-500/50 p-8 rounded-2xl max-w-md text-center shadow-2xl shadow-green-900/20">
-                            <div className="text-6xl mb-4">🔓</div>
-                            <h2 className="text-2xl font-bold text-white mb-2">Vault Unlocked!</h2>
-                            <p className="text-dark-300 mb-6">
-                                The timer hit zero. Your simulated assets and note have been sent to
-                                <span className="text-white font-mono bg-dark-800 px-1 rounded ml-1">myself@example.com</span>.
-                            </p>
-                            <div className="bg-white text-black p-4 rounded-lg font-mono text-sm text-left mb-6 shadow-inner">
-                                <div className="font-bold border-b border-black/10 pb-2 mb-2">Email Notification</div>
-                                <p>Subject: 🚨 Your Deadman&apos;s Switch was triggered</p>
-                                <p className="mt-2 text-xs opacity-70">&quot;If you are reading this, I am gone. Here are the keys...&quot;</p>
-                            </div>
-                            <a href="/create" className="btn-primary w-full py-3 block text-center">
-                                CREATE REAL VAULT
-                            </a>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+    // Kip health based on timer
+    const kipHealth = Math.max(10, progress);
 
-            <div className={`grid md:grid-cols-2 gap-8 ${isReleased ? 'blur-sm pointer-events-none' : ''}`}>
-                {/* Left: Kip & Health */}
-                <div className="card bg-dark-900/50 border border-dark-700/50 flex flex-col items-center justify-center p-8 min-h-[300px]">
-                    <div className="mb-8 scale-150">
-                        <KipAvatar
-                            seed="demo-vault-001"
-                            health={vault.health}
-                            isReleased={vault.isReleased}
-                            isCharging={false} // Simpler for demo
-                            size="lg"
-                        />
+    // Fire confetti once
+    useEffect(() => {
+        if (isReleased && !confettiFired && typeof window !== 'undefined') {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+            setConfettiFired(true);
+        }
+    }, [isReleased, confettiFired]);
+
+    const getFileIcon = (type: string) => {
+        if (type.startsWith('image/')) return <Image className="w-6 h-6" />;
+        if (type.startsWith('text/')) return <FileText className="w-6 h-6" />;
+        return <File className="w-6 h-6" />;
+    };
+
+    // RELEASED STATE - Show decrypted file
+    if (isReleased) {
+        return (
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="w-full max-w-lg mx-auto"
+            >
+                <div className="p-8 bg-dark-800/80 border border-green-500/30 backdrop-blur-xl rounded-2xl text-center space-y-6">
+                    {/* Header */}
+                    <div className="flex items-center justify-center gap-3">
+                        <motion.div
+                            initial={{ rotate: 0 }}
+                            animate={{ rotate: [0, -10, 10, 0] }}
+                            transition={{ duration: 0.5 }}
+                        >
+                            <Unlock className="w-8 h-8 text-green-500" />
+                        </motion.div>
+                        <h2 className="text-2xl font-bold text-white">Vault Decrypted</h2>
                     </div>
 
-                    <div className="w-full max-w-[200px]">
-                        <div className="flex justify-between text-xs font-bold uppercase tracking-wider mb-2">
-                            <span className="text-white">Vault Health</span>
-                            <span className={vault.health < 30 ? 'text-red-500' : 'text-primary-400'}>{vault.health}%</span>
-                        </div>
-                        <div className="h-2 bg-dark-800 rounded-full overflow-hidden">
-                            <motion.div
-                                className={`h-full ${vault.health < 30 ? 'bg-red-500' : 'bg-primary-500'}`}
-                                initial={{ width: '100%' }}
-                                animate={{ width: `${vault.health}%` }}
-                                transition={{ type: 'tween', ease: 'linear', duration: 1 }}
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Right: Controls */}
-                <div className="flex flex-col gap-4">
-                    <div className="card bg-dark-900 border border-dark-700 p-6 flex-1 flex flex-col justify-center">
-                        <div className="text-center mb-6">
-                            <div className="text-[10px] text-dark-500 uppercase tracking-widest mb-1">Time Remaining</div>
-                            <div className="text-5xl font-mono text-white tracking-tighter">
-                                00:0{vault.timeRemaining}
-                            </div>
-                        </div>
-
-                        <button
-                            onClick={actions.checkIn}
-                            className="w-full py-4 bg-safe-green hover:bg-green-500 text-black font-bold rounded-xl shadow-lg shadow-green-900/20 transition-all hover:scale-[1.02] active:scale-[0.98] mb-4"
+                    {/* Decrypted File Preview */}
+                    {uploadedFile && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.5 }}
+                            className="bg-dark-900 border border-dark-700 rounded-xl p-6 space-y-4"
                         >
-                            I&apos;M ALIVE (CHECK-IN)
-                        </button>
-
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-dark-700"></div>
+                            <div className="flex items-center justify-center gap-2 text-green-400 text-sm font-mono">
+                                <CheckCircle className="w-4 h-4" />
+                                AES-256 DECRYPTION COMPLETE
                             </div>
-                            <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-dark-900 px-2 text-dark-500">OR</span>
-                            </div>
-                        </div>
 
-                        <button
-                            onClick={actions.fastForward}
-                            className="mt-4 w-full py-3 border border-red-500/30 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors text-sm font-bold flex items-center justify-center gap-2 group"
-                        >
-                            <span>⏩</span> FAST FORWARD (DIE)
-                        </button>
-                        <p className="text-[10px] text-center text-dark-500 mt-2 italic">
-                            Simulate what happens if you expire.
+                            {/* File Content */}
+                            {uploadedFile.type.startsWith('image/') ? (
+                                <div className="relative">
+                                    <img
+                                        src={uploadedFile.dataUrl}
+                                        alt="Decrypted content"
+                                        className="max-h-48 mx-auto rounded-lg shadow-lg"
+                                    />
+                                </div>
+                            ) : uploadedFile.type.startsWith('text/') ? (
+                                <div className="bg-dark-800 p-4 rounded-lg text-left max-h-48 overflow-auto">
+                                    <p className="text-white text-sm font-mono whitespace-pre-wrap">
+                                        {atob(uploadedFile.dataUrl.split(',')[1] || '')}
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center gap-2">
+                                    <div className="w-16 h-16 rounded-xl bg-green-500/20 text-green-400 flex items-center justify-center">
+                                        {getFileIcon(uploadedFile.type)}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="text-dark-400 text-sm">
+                                <p className="font-medium text-white">{uploadedFile.name}</p>
+                                <p>{(uploadedFile.size / 1024).toFixed(1)} KB • {uploadedFile.type}</p>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* Success Message */}
+                    <div className="space-y-2">
+                        <p className="text-dark-400">
+                            The protocol executed successfully. In production, your beneficiary would receive this exact content.
                         </p>
                     </div>
 
-                    <div className="card bg-dark-900/30 border border-dark-700/30 p-4">
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-dark-400">Vault Balance</span>
-                            <span className="text-white font-mono">{vault.balanceUsdc} USDC</span>
-                        </div>
+                    {/* TX Hash */}
+                    <div className="p-4 bg-dark-900 rounded-lg border border-dark-700 text-sm font-mono text-green-400">
+                        TX: 0x8a7f...3f9c [CONFIRMED]
+                    </div>
+
+                    {/* CTA Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        <a
+                            href="/create"
+                            className="flex-1 btn-primary py-4 text-center flex items-center justify-center gap-2"
+                        >
+                            🚀 Create Your Vault
+                        </a>
+                        <button
+                            className="flex-1 btn-secondary py-4"
+                            onClick={() => window.location.reload()}
+                        >
+                            🔄 Replay Demo
+                        </button>
                     </div>
                 </div>
+            </motion.div>
+        );
+    }
+
+    // LIVE/DYING STATE
+    return (
+        <div className="w-full max-w-lg mx-auto space-y-6">
+            {/* Main Dashboard Card */}
+            <div className={`p-6 border backdrop-blur-xl rounded-2xl transition-colors duration-500 ${isDying ? 'bg-red-950/20 border-red-500/50' : 'bg-dark-800/80 border-dark-700'}`}>
+
+                {/* Header with Kip */}
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-4">
+                        <motion.div
+                            animate={isDying ? { y: [0, -3, 0] } : {}}
+                            transition={{ duration: 0.5, repeat: isDying ? Infinity : 0 }}
+                        >
+                            <KipAvatar
+                                seed="vault-dashboard"
+                                health={kipHealth}
+                                size="md"
+                                showGlow={true}
+                                className={isDying ? 'animate-pulse' : ''}
+                            />
+                        </motion.div>
+                        <div>
+                            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                {isDying ? (
+                                    <span className="text-red-500 flex items-center gap-2">
+                                        <AlertTriangle className="w-5 h-5" /> CRITICAL
+                                    </span>
+                                ) : (
+                                    <span className="text-green-500">ACTIVE</span>
+                                )}
+                            </h3>
+                            <p className="text-xs text-dark-500 font-mono">
+                                VAULT-ID: 0xDEMO...1234
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className={`text-5xl font-mono font-bold ${isDying ? 'text-red-500 animate-pulse' : 'text-white'}`}>
+                        {timer}s
+                    </div>
+                </div>
+
+                {/* Encrypted File Indicator */}
+                {uploadedFile && (
+                    <div className="mb-4 p-3 bg-dark-900/50 rounded-xl border border-dark-700 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-primary-500/20 text-primary-400 flex items-center justify-center">
+                            <Lock className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                            <p className="text-white text-sm font-medium truncate">{uploadedFile.name}</p>
+                            <p className="text-dark-500 text-xs font-mono">ENCRYPTED • AES-256-GCM</p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Health Bar */}
+                <div className="space-y-2 mb-6">
+                    <div className="flex justify-between text-xs text-dark-400">
+                        <span>Time until release</span>
+                        <span>{Math.round(progress)}% health</span>
+                    </div>
+                    <div className={`h-3 rounded-full overflow-hidden ${isDying ? 'bg-red-900/30' : 'bg-dark-700'}`}>
+                        <motion.div
+                            className={`h-full rounded-full ${isDying ? 'bg-red-500' : 'bg-gradient-to-r from-green-500 to-primary-500'}`}
+                            style={{ width: `${progress}%` }}
+                            animate={isDying ? { opacity: [1, 0.5, 1] } : {}}
+                            transition={{ duration: 0.5, repeat: isDying ? Infinity : 0 }}
+                        />
+                    </div>
+                </div>
+
+                {/* Hold to Check In Button */}
+                <div className="mb-4">
+                    <HoldCheckInButton
+                        onComplete={onCheckIn}
+                        label="HOLD TO CHECK IN"
+                        loadingLabel="VERIFYING..."
+                    />
+                </div>
+
+                {/* Fast Forward */}
+                <button
+                    onClick={onFastForward}
+                    className="w-full py-3 text-dark-400 hover:text-white hover:bg-dark-700/50 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm"
+                >
+                    <FastForward className="w-4 h-4" />
+                    Fast Forward (Demo Only)
+                </button>
             </div>
+
+            <p className="text-xs text-center text-dark-500 max-w-[80%] mx-auto">
+                *In a real vault, the timer would be 30-365 days. Hold the button for 5 seconds to trigger the &quot;Silent Alarm&quot; duress mode.
+            </p>
         </div>
     );
 }
