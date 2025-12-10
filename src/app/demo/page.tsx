@@ -94,7 +94,7 @@ export default function DemoPage() {
             </header>
 
             {/* Content Area */}
-            <div className="flex-1 flex flex-col items-center justify-center p-4 pb-32 relative z-10">
+            <div className="flex-1 flex flex-col items-center justify-center p-4 pb-44 relative z-10">
                 <AnimatePresence mode="wait">
                     {state === 'CLAIMING' && (
                         <motion.div

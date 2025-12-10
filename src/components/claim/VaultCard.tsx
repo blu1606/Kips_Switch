@@ -38,7 +38,7 @@ export default function VaultCard({ vault, onClaim }: VaultCardProps) {
             animate={{ opacity: 1, scale: 1 }}
             whileHover={canClaim ? { y: -5 } : {}}
             onClick={() => canClaim && onClaim(vault)}
-            className={`relative flex flex-col items-center justify-between p-6 rounded-3xl border transition-all duration-300 overflow-hidden min-h-[400px] ${canClaim
+            className={`relative z-50 flex flex-col items-center justify-between p-6 rounded-3xl border transition-all duration-300 overflow-hidden min-h-[400px] ${canClaim
                 ? 'cursor-pointer border-primary-500/50 bg-dark-800/80 shadow-[0_0_30px_rgba(99,102,241,0.15)] hover:shadow-[0_0_50px_rgba(99,102,241,0.25)] hover:border-primary-500'
                 : 'cursor-not-allowed border-dark-700 bg-dark-900/40 grayscale-[0.3]'
                 }`}
@@ -76,7 +76,7 @@ export default function VaultCard({ vault, onClaim }: VaultCardProps) {
             {/* Bottom Meta: Name & Action */}
             <div className="relative z-10 w-full mt-6 text-center">
                 <h3 className={`text-lg font-bold mb-1 line-clamp-1 ${canClaim ? 'text-white' : 'text-dark-300'}`}>
-                    {vault.name || 'Untitled Vault'}
+                    {vault.name || `Vault #${vault.publicKey.toBase58().slice(0, 6)}`}
                 </h3>
 
                 {!canClaim && (
