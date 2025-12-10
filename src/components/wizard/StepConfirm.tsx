@@ -4,10 +4,10 @@ import { FC, useState } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, SystemProgram } from '@solana/web3.js';
 import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
-import { VaultFormData } from '@/app/create/page';
+import { VaultFormData } from '@/types/vaultForm';
 import { uploadToIPFSWithRetry } from '@/utils/ipfs';
-import { PROGRAM_ID, getVaultPDA } from '@/utils/anchor';
-import { createEmptyBundle, addItemToBundle, bundleToBlob } from '@/utils/vaultBundle';
+import { getVaultPDA } from '@/utils/anchor';
+import { createEmptyBundle, bundleToBlob } from '@/utils/vaultBundle';
 
 interface Props {
     formData: VaultFormData;
@@ -80,7 +80,7 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
 
                 if (formData.bundleItems && formData.bundleItems.length > 0) {
                     // Create Bundle
-                    let bundle = createEmptyBundle();
+                    const bundle = createEmptyBundle();
                     // Assuming items are already fully formed VaultItems (from VaultContentEditor)
                     // We just need to add them to the bundle struct correctly
                     // VaultContentEditor returns full VaultItems, but addItemToBundle expects Omit<VaultItem, id|createdAt>
@@ -148,6 +148,7 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
             const recipientPubkey = new PublicKey(formData.recipientAddress);
 
             const idl = await import('@/idl/deadmans_switch.json');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const program = new Program(idl as any, provider);
 
             // For wallet mode, store the seed in the encrypted_key field
@@ -155,6 +156,7 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
                 ? `wallet:${seed.toString()}`
                 : formData.aesKeyBase64;
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const tx = await (program.methods as any)
                 .initializeVault(
                     seed,
@@ -182,6 +184,7 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
             setTimeout(() => {
                 onSuccess();
             }, 3000);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             console.error('Vault creation failed:', err);
             setError(err.message || 'Failed to create vault');

@@ -125,10 +125,13 @@ function ChartTooltipContent({
     indicator?: "line" | "dot" | "dashed"
     nameKey?: string
     labelKey?: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     payload?: any[]
     label?: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     labelFormatter?: (label: any, payload: any[]) => React.ReactNode
     labelClassName?: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     formatter?: any
     color?: string
   }) {
@@ -265,6 +268,7 @@ function ChartLegendContent({
 }: React.ComponentProps<"div"> & {
   hideIcon?: boolean
   nameKey?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   payload?: any[]
   verticalAlign?: "top" | "middle" | "bottom"
 }) {

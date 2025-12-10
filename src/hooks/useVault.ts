@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
+import { Program, AnchorProvider, BN, Idl } from '@coral-xyz/anchor';
 import { PROGRAM_ID } from '@/utils/anchor';
 import { parseVaultAccount, VaultData } from '@/utils/solanaParsers';
+import { DeadmansSwitch } from '@/types/deadmans-switch';
 
 export type { VaultData }; // Re-export for consumers
 
@@ -42,7 +43,7 @@ export function useOwnerVaults(): UseOwnerVaultsResult {
         const percentageRemaining = interval > 0 ? (timeRemaining / interval) * 100 : 0;
 
         let healthStatus: 'healthy' | 'warning' | 'critical' = 'healthy';
-        const daysRemaining = timeRemaining / 86400;
+
 
         if (percentageRemaining < 25) {
             healthStatus = 'critical';
@@ -106,9 +107,10 @@ export function useOwnerVaults(): UseOwnerVaultsResult {
         );
 
         const idl = await import('@/idl/deadmans_switch.json');
-        const program = new Program(idl as any, provider);
 
-        const tx = await (program.methods as any)
+        const program = new Program<DeadmansSwitch>(idl as unknown as Idl, provider);
+
+        const tx = await program.methods
             .ping()
             .accounts({
                 vault: vault.publicKey,

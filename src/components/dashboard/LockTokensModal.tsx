@@ -47,7 +47,7 @@ const LockTokensModal: FC<LockTokensModalProps> = ({ vaultAddress, existingMint,
                 const mintInfo = await connection.getParsedAccountInfo(mintPubkey);
                 if (!mintInfo.value) return;
 
-                // @ts-ignore
+                // @ts-expect-error: SPL Token types for parsed info are incomplete
                 const decimals = mintInfo.value.data.parsed.info.decimals;
                 setTokenDecimals(decimals);
 
@@ -57,7 +57,7 @@ const LockTokensModal: FC<LockTokensModalProps> = ({ vaultAddress, existingMint,
                     const account = await getAccount(connection, userAta);
                     setUserBalance(Number(account.amount) / Math.pow(10, decimals));
                     setError(null);
-                } catch (e) {
+                } catch {
                     // Start from 0 if no account
                     setUserBalance(0);
                 }
@@ -85,6 +85,7 @@ const LockTokensModal: FC<LockTokensModalProps> = ({ vaultAddress, existingMint,
             );
 
             const idl = await import('@/idl/deadmans_switch.json');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const program = new Program(idl as any, provider);
 
             const mintPubkey = new PublicKey(mintAddress);
@@ -94,6 +95,7 @@ const LockTokensModal: FC<LockTokensModalProps> = ({ vaultAddress, existingMint,
             const vaultTokenAccount = await getAssociatedTokenAddress(mintPubkey, vaultAddress, true);
             const ownerTokenAccount = await getAssociatedTokenAddress(mintPubkey, publicKey);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (program.methods as any)
                 .lockTokens(rawAmount)
                 .accounts({
@@ -110,6 +112,7 @@ const LockTokensModal: FC<LockTokensModalProps> = ({ vaultAddress, existingMint,
 
             setStatus('success');
             setTimeout(onSuccess, 1500);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error("Lock Tokens failed", error);
             setStatus('idle');
@@ -122,7 +125,7 @@ const LockTokensModal: FC<LockTokensModalProps> = ({ vaultAddress, existingMint,
             <div className="bg-dark-800 rounded-xl max-w-sm w-full p-6 border border-dark-700 shadow-2xl">
                 <h2 className="text-xl font-bold mb-1">Lock SPL Tokens</h2>
                 <p className="text-sm text-dark-400 mb-6">
-                    Add tokens to your vault's payload.
+                    Add tokens to your vault&apos;s payload.
                 </p>
 
                 {status === 'success' ? (

@@ -3,7 +3,7 @@
 import { FC, useState, useCallback, useEffect } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { VaultFormData } from '@/app/create/page';
+import { VaultFormData } from '@/types/vaultForm';
 
 interface Props {
     formData: VaultFormData;

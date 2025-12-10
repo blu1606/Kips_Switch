@@ -83,6 +83,7 @@ export async function POST(req: Request) {
             scheduledFor: scheduledAt.toISOString()
         });
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         console.error('Notify subscribe error:', error);
         return NextResponse.json(

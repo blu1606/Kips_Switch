@@ -71,6 +71,7 @@ const VoiceRecorder: FC<VoiceRecorderProps> = ({
                 });
             }, 1000);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             console.error('Failed to start recording:', err);
             setError('Microphone access denied. Please allow microphone access.');

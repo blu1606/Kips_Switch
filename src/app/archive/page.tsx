@@ -12,6 +12,7 @@ import { BN } from '@coral-xyz/anchor';
 export default function ArchivePage() {
     const { connected } = useWallet();
     const { vaults, loading, clearHistory } = useClaimedVaults();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [selectedVault, setSelectedVault] = useState<any | null>(null);
 
     // Reconstruct vault object for ClaimModal

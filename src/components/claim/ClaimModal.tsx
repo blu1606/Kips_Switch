@@ -18,6 +18,7 @@ import { BN } from '@coral-xyz/anchor';
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddress } from '@solana/spl-token';
 
 interface ClaimModalProps {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vault: any;
     onClose: () => void;
     onSuccess: () => void;
@@ -167,6 +168,7 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
             });
 
             onSuccess();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             console.error('Claim failed:', err);
             setIsDecrypting(false);
@@ -187,8 +189,10 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
         try {
             const provider = new AnchorProvider(connection, { publicKey, signTransaction, signAllTransactions }, { commitment: 'confirmed' });
             const idl = await import('@/idl/deadmans_switch.json');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const program = new Program(idl as any, provider);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (program.methods as any)
                 .claimSol()
                 .accounts({
@@ -199,6 +203,7 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
                 .rpc();
 
             setSolClaimed(true);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             console.error('Claim SOL failed:', err);
             setError(err.message || 'Failed to claim SOL');
@@ -213,6 +218,7 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
         try {
             const provider = new AnchorProvider(connection, { publicKey, signTransaction, signAllTransactions }, { commitment: 'confirmed' });
             const idl = await import('@/idl/deadmans_switch.json');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const program = new Program(idl as any, provider);
 
             // We need the token mint. It's in the vault data (parsing logic updated).
@@ -224,6 +230,7 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
             const vaultTokenAccount = await getAssociatedTokenAddress(tokenMint, vault.publicKey, true);
             const recipientTokenAccount = await getAssociatedTokenAddress(tokenMint, publicKey);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (program.methods as any)
                 .claimTokens()
                 .accounts({
@@ -239,6 +246,7 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
                 .rpc();
 
             setTokensClaimed(true);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             console.error('Claim Tokens failed:', err);
             setError(err.message || 'Failed to claim tokens');
@@ -267,8 +275,10 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
             );
 
             const idl = await import('@/idl/deadmans_switch.json');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const program = new Program(idl as any, provider);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (program.methods as any)
                 .claimAndClose()
                 .accounts({
@@ -278,6 +288,7 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
                 .rpc();
 
             setVaultClosed(true);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             console.error('Close failed:', err);
             setError(err.message || 'Failed to close vault');

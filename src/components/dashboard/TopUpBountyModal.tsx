@@ -34,11 +34,13 @@ const TopUpBountyModal: FC<TopUpBountyModalProps> = ({ vaultAddress, currentBoun
             );
 
             const idl = await import('@/idl/deadmans_switch.json');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const program = new Program(idl as any, provider);
 
             // Convert SOL amount to lamports
             const lamports = new BN(amount * 1_000_000_000);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (program.methods as any)
                 .topUpBounty(lamports)
                 .accounts({

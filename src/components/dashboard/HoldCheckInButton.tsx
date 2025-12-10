@@ -31,14 +31,14 @@ export default function HoldCheckInButton({
     const HOLD_DURATION = 1500; // ms
     const DURESS_DURATION = 5000; // ms for silent alarm
     const UPDATE_INTERVAL = 16; // ~60fps
-    const HAPTIC_INTERVAL = 100; // ms
+
 
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const progressRef = useRef(0);
     const isDuressRef = useRef(false);
-    const lastHapticRef = useRef(0);
 
-    const startHolding = (e: React.MouseEvent | React.TouchEvent) => {
+
+    const startHolding = () => {
         if (disabled || isComplete) return;
 
         setIsHolding(true);

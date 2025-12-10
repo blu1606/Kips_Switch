@@ -1,17 +1,19 @@
 'use client';
 
 import { FC, useState, useCallback } from 'react';
-import { VaultFormData } from '@/app/create/page';
+import { VaultFormData } from '@/types/vaultForm';
 import { VaultItem } from '@/types/vaultBundle';
 import VaultContentEditor from '@/components/vault/VaultContentEditor';
+import { validatePassword } from '@/utils/validation';
 
 interface Props {
     formData: VaultFormData;
     updateFormData: (updates: Partial<VaultFormData>) => void;
     onNext: () => void;
+    onBack: () => void;
 }
 
-const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext }) => {
+const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext, onBack }) => {
     const [encryptionMode, setEncryptionMode] = useState<'wallet' | 'password'>(formData.encryptionMode || 'wallet');
     const [password, setPassword] = useState(formData.password || '');
     const [confirmPassword, setConfirmPassword] = useState(formData.password || '');
@@ -36,15 +38,18 @@ const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext }) => {
             return;
         }
 
+
         if (encryptionMode === 'password') {
-            if (!password) { setError('Password is required.'); return; }
-            if (password !== confirmPassword) { setError('Passwords do not match.'); return; }
-            if (password.length < 6) { setError('Password must be at least 6 characters.'); return; }
+            const pwdError = validatePassword(password, confirmPassword);
+            if (pwdError) {
+                setError(pwdError);
+                return;
+            }
 
             updateFormData({
                 encryptionMode: 'password',
                 password: password,
-                aesKeyBase64: 'password-protected' // Placeholder, actual key derived in generic step
+                aesKeyBase64: 'password-protected' // Placeholder
             });
         } else {
             updateFormData({
@@ -141,6 +146,9 @@ const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext }) => {
             )}
 
             <div className="flex gap-3 pt-4">
+                <button onClick={onBack} className="btn-secondary">
+                    ← Back
+                </button>
                 <button
                     onClick={handleContinue}
                     disabled={!hasContent || (encryptionMode === 'password' && (!password || password !== confirmPassword))}

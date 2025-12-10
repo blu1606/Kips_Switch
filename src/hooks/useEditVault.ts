@@ -68,6 +68,7 @@ export function useEditVault({ vault, onSuccess }: UseEditVaultProps) {
 
             // Dynamic import to avoid SSR issues
             const idl = await import('@/idl/deadmans_switch.json');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const program = new Program(idl as any, provider);
 
             // Determine what changed
@@ -76,6 +77,7 @@ export function useEditVault({ vault, onSuccess }: UseEditVaultProps) {
             const nameChanged = vaultName !== (vault.name || '');
 
             if (recipientChanged || intervalChanged || nameChanged) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 await (program.methods as any)
                     .updateVault(
                         recipientChanged ? recipientPubkey : null,
@@ -122,6 +124,7 @@ export function useEditVault({ vault, onSuccess }: UseEditVaultProps) {
             setTimeout(() => {
                 onSuccess();
             }, 1000);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             console.error('Update failed:', err);
             setError(err.message || 'Failed to update vault');

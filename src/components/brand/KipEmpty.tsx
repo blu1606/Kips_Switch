@@ -38,7 +38,7 @@ export default function KipEmpty() {
             </motion.div>
 
             <h3 className="text-lg font-bold text-dark-300 font-mono mb-2">
-                I'm a spirit without a home.
+                I&apos;m a spirit without a home.
             </h3>
             <p className="text-sm text-dark-500 max-w-xs leading-relaxed">
                 Create a vault to give me life. I will guard your legacy until the stars fade.

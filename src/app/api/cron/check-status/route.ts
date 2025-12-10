@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { Program, AnchorProvider, Wallet } from '@coral-xyz/anchor';
+// import { Program, AnchorProvider, Wallet } from '@coral-xyz/anchor';
 import { PROGRAM_ID } from '@/utils/anchor';
 import { getSupabaseAdmin } from '@/utils/supabase';
 
@@ -115,7 +115,8 @@ export async function GET(request: NextRequest) {
             if (!data) return {};
 
             // Map vault_address -> contacts
-            return data.reduce((acc: Record<string, { ownerEmail: string | null; recipientEmail: string | null }>, curr: any) => {
+            // Map vault_address -> contacts
+            return data.reduce((acc: Record<string, { ownerEmail: string | null; recipientEmail: string | null }>, curr: { vault_address: string; owner_email: string | null; recipient_email: string | null }) => {
                 acc[curr.vault_address] = {
                     ownerEmail: curr.owner_email,
                     recipientEmail: curr.recipient_email
@@ -161,7 +162,7 @@ export async function GET(request: NextRequest) {
                     contacts.ownerEmail,
                     vault.address,
                     vault.daysUntilExpiry,
-                    urgency as any
+                    urgency as 'final' | 'urgent' | 'warning'
                 );
                 if (sent) emailResults.ownerReminders++;
             }
@@ -187,11 +188,12 @@ export async function GET(request: NextRequest) {
                 daysRemaining: vault.daysUntilExpiry.toFixed(1),
             })),
         });
-    } catch (err: any) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err) {
         console.error('[Cron] Error:', err);
         return NextResponse.json({
             error: 'Cron job failed',
-            message: err.message
+            message: err instanceof Error ? err.message : 'Unknown error'
         }, { status: 500 });
     }
 }

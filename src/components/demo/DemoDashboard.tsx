@@ -25,8 +25,8 @@ export default function DemoDashboard() {
                             </p>
                             <div className="bg-white text-black p-4 rounded-lg font-mono text-sm text-left mb-6 shadow-inner">
                                 <div className="font-bold border-b border-black/10 pb-2 mb-2">Email Notification</div>
-                                <p>Subject: 🚨 Your Deadman's Switch was triggered</p>
-                                <p className="mt-2 text-xs opacity-70">"If you are reading this, I am gone. Here are the keys..."</p>
+                                <p>Subject: 🚨 Your Deadman&apos;s Switch was triggered</p>
+                                <p className="mt-2 text-xs opacity-70">&quot;If you are reading this, I am gone. Here are the keys...&quot;</p>
                             </div>
                             <a href="/create" className="btn-primary w-full py-3 block text-center">
                                 CREATE REAL VAULT
@@ -79,7 +79,7 @@ export default function DemoDashboard() {
                             onClick={actions.checkIn}
                             className="w-full py-4 bg-safe-green hover:bg-green-500 text-black font-bold rounded-xl shadow-lg shadow-green-900/20 transition-all hover:scale-[1.02] active:scale-[0.98] mb-4"
                         >
-                            I'M ALIVE (CHECK-IN)
+                            I&apos;M ALIVE (CHECK-IN)
                         </button>
 
                         <div className="relative">

@@ -1,7 +1,7 @@
 'use client';
 
 import { FC, useState, useRef } from 'react';
-import { VaultItem, VaultItemType, BUNDLE_LIMITS } from '@/types/vaultBundle';
+import { VaultItem, BUNDLE_LIMITS } from '@/types/vaultBundle';
 import { fileToVaultItem, textToVaultItem, getItemIcon, formatFileSize } from '@/utils/vaultBundle';
 import VoiceRecorder from './VoiceRecorder';
 
@@ -55,6 +55,7 @@ const VaultContentEditor: FC<VaultContentEditorProps> = ({
             try {
                 const item = await fileToVaultItem(file);
                 onItemsChange([...items, item]);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (err: any) {
                 setError(err.message);
             }
@@ -65,7 +66,7 @@ const VaultContentEditor: FC<VaultContentEditorProps> = ({
         }
     };
 
-    const handleRecordingComplete = async (blob: Blob, durationSeconds: number) => {
+    const handleRecordingComplete = async (blob: Blob) => {
         setIsRecording(false);
         setError(null);
 
@@ -73,6 +74,7 @@ const VaultContentEditor: FC<VaultContentEditorProps> = ({
             const file = new File([blob], `Recording_${Date.now()}.webm`, { type: blob.type || 'audio/webm' });
             const item = await fileToVaultItem(file);
             onItemsChange([...items, item]);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             setError(err.message);
         }

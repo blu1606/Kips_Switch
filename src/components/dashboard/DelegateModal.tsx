@@ -61,8 +61,10 @@ const DelegateModal: FC<DelegateModalProps> = ({ vault, onClose, onSuccess }) =>
             );
 
             const idl = await import('@/idl/deadmans_switch.json');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const program = new Program(idl as any, provider);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (program.methods as any)
                 .setDelegate(delegatePubkey)
                 .accounts({
@@ -75,6 +77,7 @@ const DelegateModal: FC<DelegateModalProps> = ({ vault, onClose, onSuccess }) =>
             setTimeout(() => {
                 onSuccess();
             }, 1500);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             console.error('Set delegate failed:', err);
             setError(err.message || 'Failed to set delegate');
@@ -99,8 +102,10 @@ const DelegateModal: FC<DelegateModalProps> = ({ vault, onClose, onSuccess }) =>
             );
 
             const idl = await import('@/idl/deadmans_switch.json');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const program = new Program(idl as any, provider);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (program.methods as any)
                 .setDelegate(null)
                 .accounts({
@@ -113,6 +118,7 @@ const DelegateModal: FC<DelegateModalProps> = ({ vault, onClose, onSuccess }) =>
             setTimeout(() => {
                 onSuccess();
             }, 1500);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             console.error('Clear delegate failed:', err);
             setError(err.message || 'Failed to clear delegate');
@@ -143,7 +149,7 @@ const DelegateModal: FC<DelegateModalProps> = ({ vault, onClose, onSuccess }) =>
                                 <strong>🔐 What is a delegate?</strong>
                             </p>
                             <p className="text-xs text-dark-400 mt-2">
-                                A delegate is a secondary wallet (like a mobile "hot wallet") that can perform
+                                A delegate is a secondary wallet (like a mobile &quot;hot wallet&quot;) that can perform
                                 check-ins on your behalf. The delegate can <strong>only ping</strong> — they
                                 cannot update vault settings, close the vault, or access your encrypted data.
                             </p>

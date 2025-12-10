@@ -100,7 +100,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
             setState('CREATING');
             setStep(2);
         },
-        createVault: (name: string, recipient: string) => {
+        createVault: (name: string) => {
             // User creates their own vault
             setVault(prev => ({
                 ...prev,
@@ -138,11 +138,10 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <DemoContext.Provider value= {{ state, step, vault, actions }
-}>
-    { children }
-    </DemoContext.Provider>
-    );
+        <DemoContext.Provider value={{ state, step, vault, actions }
+        }>
+            {children}
+        </DemoContext.Provider>
     );
 }
 

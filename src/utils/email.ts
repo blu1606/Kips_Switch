@@ -281,6 +281,7 @@ export async function sendScheduledVaultReady(
 
         console.log(`[Email] Scheduled for ${recipientEmail} at ${actualScheduleTime.toISOString()}`);
         return { success: true, id: data?.id };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         console.error('[Email] Scheduled error:', err);
         return { success: false, error: err.message };

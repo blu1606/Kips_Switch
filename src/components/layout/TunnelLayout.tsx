@@ -1,7 +1,4 @@
-'use client';
-
 import { FC, ReactNode } from 'react';
-import Link from 'next/link';
 
 interface TunnelLayoutProps {
     children: ReactNode;
@@ -15,7 +12,7 @@ const TunnelLayout: FC<TunnelLayoutProps> = ({ children, title, step, totalSteps
     const progress = (step / totalSteps) * 100;
 
     return (
-        <div className="min-h-screen bg-dark-900 flex flex-col">
+        <div className="fixed inset-0 z-[100] bg-dark-900 overflow-y-auto flex flex-col">
             {/* Minimal Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-dark-800 bg-dark-900/50 backdrop-blur-sm fixed top-0 w-full z-50">
                 <div className="flex items-center gap-3">

@@ -47,13 +47,23 @@ export default function Home() {
                             <div className="flex flex-col sm:flex-row gap-4 mb-12">
                                 {connected ? (
                                     <>
-                                        <Link href="/create" className="btn-primary text-lg px-8 py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-primary-900/20 hover:shadow-primary-500/20 transition-all">
-                                            <span>Create Vault</span>
-                                            <Sparkles className="w-5 h-5" />
-                                        </Link>
-                                        <Link href="/dashboard" className="px-8 py-4 rounded-2xl bg-dark-800/40 border border-white/5 hover:bg-dark-800/60 transition-all text-white font-medium text-lg flex items-center justify-center">
-                                            My Sanctuaries
-                                        </Link>
+                                        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                                            <Link href="/create" className="btn-primary text-lg px-8 py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-primary-900/20 hover:shadow-primary-500/20 transition-all">
+                                                <span>Create Vault</span>
+                                                <Sparkles className="w-5 h-5" />
+                                            </Link>
+                                            <Link href="/dashboard" className="px-8 py-4 rounded-2xl bg-dark-800/40 border border-white/5 hover:bg-dark-800/60 transition-all text-white font-medium text-lg flex items-center justify-center">
+                                                My Sanctuaries
+                                            </Link>
+                                        </div>
+                                        <div className="flex justify-center sm:justify-start">
+                                            <Link
+                                                href="/demo"
+                                                className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary-500/30 transition-all text-white font-medium flex items-center justify-center gap-2 text-sm opacity-80 hover:opacity-100"
+                                            >
+                                                <span>▶️ Try Demo</span>
+                                            </Link>
+                                        </div>
                                     </>
                                 ) : (
                                     <div className="flex flex-col gap-4">
@@ -102,7 +112,7 @@ export default function Home() {
                                 </div>
                                 <h3 className="text-2xl font-bold text-white mb-2">The Heartbeat</h3>
                                 <p className="text-dark-300 text-sm leading-relaxed">
-                                    A simple "I'm here" resets the timer. If the silence grows too long, the protocol awakens.
+                                    A simple &quot;I&apos;m here&quot; resets the timer. If the silence grows too long, the protocol awakens.
                                 </p>
                             </div>
                             {/* Abstract pulse visual */}
@@ -123,8 +133,8 @@ export default function Home() {
                                 <div className="mb-8 p-4 bg-dark-900/50 rounded-2xl border border-white/5 font-mono text-xs text-primary-300/70 overflow-hidden leading-relaxed opacity-60">
                                     0x7F...3A2B<br />
                                     ENCRYPTED_PAYLOAD<br />
-                                    kty: "RSA",<br />
-                                    alg: "OAEP-256",<br />
+                                    kty: &quot;RSA&quot;,<br />
+                                    alg: &quot;OAEP-256&quot;,<br />
                                     ext: true,<br />
                                 </div>
                                 <h3 className="text-2xl font-bold text-white mb-2">Zero Knowledge</h3>
@@ -194,7 +204,7 @@ export default function Home() {
             {/* Footer Minimal */}
             <footer className="py-8 text-center border-t border-white/5 bg-dark-900">
                 <p className="text-dark-600 text-xs font-mono uppercase tracking-widest opacity-60">
-                    Protocol v0.6 • Deadman's Switch • Solana
+                    Protocol v0.6 • Deadman&apos;s Switch • Solana
                 </p>
             </footer>
         </main>

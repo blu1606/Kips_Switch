@@ -1,5 +1,5 @@
 import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
-import { AnchorProvider, Program } from '@coral-xyz/anchor';
+import { BN } from '@coral-xyz/anchor';
 
 // Program ID - Update this after deploying to devnet
 export const PROGRAM_ID = new PublicKey('HnFEhMS84CabpztHCDdGGN8798NxNse7NtXW4aG17XpB');
@@ -17,8 +17,6 @@ export const getConnection = (): Connection => {
     }
     return connectionInstance;
 };
-
-import { BN } from '@coral-xyz/anchor';
 
 // Vault PDA helper
 export const getVaultPDA = (owner: PublicKey, seed: BN): [PublicKey, number] => {

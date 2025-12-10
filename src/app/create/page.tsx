@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useRouter } from 'next/navigation';
 import StepUploadSecret from '@/components/wizard/StepUploadSecret';
@@ -10,76 +10,22 @@ import StepConfirm from '@/components/wizard/StepConfirm';
 import TemplateSelector from '@/components/wizard/TemplateSelector';
 import TunnelLayout from '@/components/layout/TunnelLayout';
 import WalletButton from '@/components/wallet/WalletButton';
-
-export interface VaultFormData {
-    // Vault Name (10.1)
-    vaultName: string;
-
-    // 10.2: Bundle items (multi-media)
-    bundleItems: import('@/types/vaultBundle').VaultItem[];
-
-    // Step 1: File (legacy single-file mode)
-    file: File | null;
-    encryptedBlob: Blob | null;
-    aesKeyBase64: string;
-
-    // Encryption mode
-    encryptionMode: 'password' | 'wallet';
-    password?: string; // Only for password mode
-
-    // Step 2: Recipient
-    recipientAddress: string;
-    recipientEmail: string;
-
-    // Step 3: Interval
-    timeInterval: number; // seconds
-}
-
-const STEPS = [
-    { id: 0, name: 'Template', description: 'Choose Mode' },
-    { id: 1, name: 'Upload Secret', description: 'Encrypt your file' },
-    { id: 2, name: 'Set Recipient', description: 'Who can claim' },
-    { id: 3, name: 'Set Interval', description: 'Check-in period' },
-    { id: 4, name: 'Confirm', description: 'Review & create' },
-];
+import { useCreateVaultState } from '@/hooks/useCreateVaultState';
 
 export default function CreateVaultPage() {
     const { connected } = useWallet();
     const router = useRouter();
 
-    // Start at Step 0 (Templates)
-    const [currentStep, setCurrentStep] = useState(0);
-    const [formData, setFormData] = useState<VaultFormData>({
-        vaultName: '',
-        bundleItems: [], // 10.2
-        file: null,
-        encryptedBlob: null,
-        aesKeyBase64: '',
-        encryptionMode: 'wallet',
-        recipientAddress: '',
-        recipientEmail: '',
-        timeInterval: 30 * 24 * 60 * 60,
-    });
-
-    const updateFormData = useCallback((updates: Partial<VaultFormData>) => {
-        setFormData((prev) => ({ ...prev, ...updates }));
-    }, []);
-
-    const nextStep = useCallback(() => {
-        setCurrentStep((prev) => Math.min(prev + 1, 4));
-    }, []);
-
-    const prevStep = useCallback(() => {
-        setCurrentStep((prev) => Math.max(prev - 1, 0));
-    }, []);
-
-    // Handle Template Selection (Step 0)
-    const handleTemplateSelect = useCallback((intervalSeconds: number) => {
-        if (intervalSeconds > 0) {
-            updateFormData({ timeInterval: intervalSeconds });
-        }
-        nextStep();
-    }, [nextStep, updateFormData]);
+    // Use custom hook for state and logic
+    const {
+        currentStep,
+        formData,
+        steps: STEPS,
+        updateFormData,
+        nextStep,
+        prevStep,
+        setTemplateInterval
+    } = useCreateVaultState();
 
     const handleSuccess = useCallback(() => {
         router.push('/dashboard');
@@ -121,13 +67,14 @@ export default function CreateVaultPage() {
         >
             <div className="animate-fade-in">
                 {currentStep === 0 && (
-                    <TemplateSelector onSelect={handleTemplateSelect} />
+                    <TemplateSelector onSelect={setTemplateInterval} />
                 )}
                 {currentStep === 1 && (
                     <StepUploadSecret
                         formData={formData}
                         updateFormData={updateFormData}
                         onNext={nextStep}
+                        onBack={prevStep}
                     />
                 )}
                 {currentStep === 2 && (

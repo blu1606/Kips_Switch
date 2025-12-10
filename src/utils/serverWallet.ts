@@ -1,5 +1,5 @@
 import { Keypair } from '@solana/web3.js';
-// @ts-ignore - bs58 provides its own types but TS can't find them
+// @ts-expect-error - bs58 provides its own types but TS can't find them
 import bs58 from 'bs58';
 
 let cachedKeypair: Keypair | null = null;

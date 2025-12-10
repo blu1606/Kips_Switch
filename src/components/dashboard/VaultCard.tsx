@@ -1,10 +1,12 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { VaultStatus } from '@/hooks/useVault';
 import { VaultData } from '@/utils/solanaParsers';
-import { truncateAddress } from '@/lib/utils'; // Keep this as it's used
+import { truncateAddress } from '@/lib/utils';
 import HoldCheckInButton from './HoldCheckInButton';
 import KipAvatar from '@/components/brand/KipAvatar';
 import { BN } from '@coral-xyz/anchor';
+import { useConnection } from '@solana/wallet-adapter-react';
+import { getMint } from '@solana/spl-token';
 
 interface VaultCardProps {
     vault: VaultData;
@@ -18,8 +20,8 @@ interface VaultCardProps {
     onTopUp: () => void;
     onLockTokens: () => void;
     onDuress?: () => void;
-    onUpdate?: () => void; // Added for compatibility if dashboard sends it
-    onCloseVault?: () => void; // Added for compatibility
+    onUpdate?: () => void;
+    onCloseVault?: () => void;
 }
 
 const VaultCard: FC<VaultCardProps> = ({
@@ -35,23 +37,50 @@ const VaultCard: FC<VaultCardProps> = ({
     onLockTokens,
     onDuress
 }) => {
+    const { connection } = useConnection();
     const key = vault.publicKey.toBase58();
 
     // Calculate precise health % for Kip
-    // health = (timeRemaining / timeInterval) * 100
     const totalTime = vault.timeInterval.toNumber();
     const remaining = Math.max(0, status.timeRemaining);
-    // Avoid division by zero
     const healthPercent = totalTime > 0 ? Math.min(100, Math.max(0, (remaining / totalTime) * 100)) : 0;
 
     const [isCharging, setIsCharging] = useState(false);
+    const [tokenDecimals, setTokenDecimals] = useState<number | null>(null);
 
-    // Helper to format usage in the card (local definition to avoid import issues if utils missing)
+    // Fetch Token Decimals if SPL tokens are locked
+    useEffect(() => {
+        const fetchDecimals = async () => {
+            if (vault.tokenMint && vault.lockedTokens.gt(new BN(0))) {
+                try {
+                    const mintInfo = await getMint(connection, vault.tokenMint);
+                    setTokenDecimals(mintInfo.decimals);
+                } catch (e) {
+                    console.error("Failed to fetch mint info", e);
+                    // Fallback or keep as null (raw display)
+                }
+            }
+        };
+
+        fetchDecimals();
+    }, [vault.tokenMint, vault.lockedTokens, connection]);
+
     const formatLabel = (seconds: number) => {
         if (seconds <= 0) return "EXPIRED";
         const d = Math.floor(seconds / (3600 * 24));
         const h = Math.floor((seconds % (3600 * 24)) / 3600);
         return `${d}d ${h}h`;
+    };
+
+    const formatTokenAmount = (amount: BN, decimals: number | null) => {
+        if (decimals === null) return amount.toString(); // Fallback to raw if logic fails
+        const divisor = Math.pow(10, decimals);
+        const val = amount.toNumber() / divisor;
+
+        // Smart formatting
+        if (val === 0) return "0";
+        if (val < 0.001) return "< 0.001";
+        return val.toLocaleString(undefined, { maximumFractionDigits: decimals > 2 ? 4 : 2 });
     };
 
     return (
@@ -71,7 +100,7 @@ const VaultCard: FC<VaultCardProps> = ({
                         isReleased={vault.isReleased}
                         size="md"
                         isCharging={isCharging}
-                        showGlow={!vault.isReleased} // No glow if dead? Or yes? Spec says Ghost glows.
+                        showGlow={!vault.isReleased}
                     />
 
                     {/* Streak Display under Kip */}
@@ -124,7 +153,7 @@ const VaultCard: FC<VaultCardProps> = ({
                                         )}
                                         {vault.lockedTokens.gt(new BN(0)) && (
                                             <span className="font-mono text-primary-400 text-sm">
-                                                {vault.lockedTokens.toString()} Tokens
+                                                {formatTokenAmount(vault.lockedTokens, tokenDecimals)} Tokens
                                             </span>
                                         )}
                                     </div>

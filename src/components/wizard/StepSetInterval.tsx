@@ -1,7 +1,7 @@
 'use client';
 
 import { FC } from 'react';
-import { VaultFormData } from '@/app/create/page';
+import { VaultFormData } from '@/types/vaultForm';
 
 interface Props {
     formData: VaultFormData;
@@ -60,46 +60,64 @@ const StepSetInterval: FC<Props> = ({ formData, updateFormData, onNext, onBack }
 
             {/* Interval Options */}
             <div className="space-y-3">
-                {INTERVAL_OPTIONS.map((option) => (
-                    <button
-                        key={option.value}
-                        onClick={() => handleSelectInterval(option.value)}
-                        className={`
+                {(() => {
+                    // Check if current value matches any existing option
+                    const isCustom = !INTERVAL_OPTIONS.some(opt => opt.value === formData.timeInterval);
+
+                    // Create effective options list
+                    const displayOptions = [...INTERVAL_OPTIONS];
+
+                    // If custom value exists (e.g. from template), add it to the top or logical place
+                    if (isCustom && formData.timeInterval > 0) {
+                        displayOptions.unshift({
+                            label: `${Math.floor(formData.timeInterval / 86400)} Days (Custom/Template)`,
+                            value: formData.timeInterval,
+                            description: 'Value selected via template or custom setting',
+                            recommended: false
+                        });
+                    }
+
+                    return displayOptions.map((option) => (
+                        <button
+                            key={option.value}
+                            onClick={() => handleSelectInterval(option.value)}
+                            className={`
               w-full p-4 rounded-xl border text-left transition-all
               ${formData.timeInterval === option.value
-                                ? 'border-primary-500 bg-primary-500/10'
-                                : 'border-dark-600 hover:border-dark-500 bg-dark-800/50'
-                            }
+                                    ? 'border-primary-500 bg-primary-500/10'
+                                    : 'border-dark-600 hover:border-dark-500 bg-dark-800/50'
+                                }
             `}
-                    >
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <div className="flex items-center gap-2">
-                                    <span className="font-semibold">{option.label}</span>
-                                    {option.recommended && (
-                                        <span className="text-xs bg-primary-600/30 text-primary-400 px-2 py-0.5 rounded">
-                                            Recommended
-                                        </span>
-                                    )}
+                        >
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-semibold">{option.label}</span>
+                                        {option.recommended && (
+                                            <span className="text-xs bg-primary-600/30 text-primary-400 px-2 py-0.5 rounded">
+                                                Recommended
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-dark-400 text-sm mt-1">{option.description}</p>
                                 </div>
-                                <p className="text-dark-400 text-sm mt-1">{option.description}</p>
-                            </div>
-                            <div className={`
+                                <div className={`
                 w-5 h-5 rounded-full border-2 flex items-center justify-center
                 ${formData.timeInterval === option.value
-                                    ? 'border-primary-500 bg-primary-500'
-                                    : 'border-dark-500'
-                                }
+                                        ? 'border-primary-500 bg-primary-500'
+                                        : 'border-dark-500'
+                                    }
               `}>
-                                {formData.timeInterval === option.value && (
-                                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                    </svg>
-                                )}
+                                    {formData.timeInterval === option.value && (
+                                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    </button>
-                ))}
+                        </button>
+                    ));
+                })()}
             </div>
 
             {/* Explanation */}

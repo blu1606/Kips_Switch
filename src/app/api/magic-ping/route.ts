@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
-import { Program, AnchorProvider, Wallet } from '@coral-xyz/anchor';
+import { Program, AnchorProvider, Idl } from '@coral-xyz/anchor';
+import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
 import { getServerKeypair } from '@/utils/serverWallet';
 import { verifyMagicLinkToken } from '@/utils/jwt';
+import { DeadmansSwitch, VaultAccount } from '@/types/deadmans-switch';
 
 // GET /api/magic-ping?vault=...&token=...
 export async function GET(req: Request) {
@@ -33,14 +35,16 @@ export async function GET(req: Request) {
         // 4. Setup Anchor
         const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || clusterApiUrl('devnet');
         const connection = new Connection(rpcUrl, 'confirmed');
-        const wallet = new Wallet(serverKeypair);
+        const wallet = new NodeWallet(serverKeypair);
         const provider = new AnchorProvider(connection, wallet, { commitment: 'confirmed' });
 
         const idl = await import('@/idl/deadmans_switch.json');
-        const program = new Program(idl as any, provider);
+        const program = new Program<DeadmansSwitch>(idl as unknown as Idl, provider);
 
         // 5. Fetch vault and verify delegate is set to server
-        const vaultAccount = await (program.account as any).vault.fetch(vaultPubkey);
+        // Note: Anchor type mapping for accounts can be tricky, casting safely
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const vaultAccount = await (program.account as any).vault.fetch(vaultPubkey) as VaultAccount;
 
         if (!vaultAccount.delegate ||
             vaultAccount.delegate.toBase58() !== serverKeypair.publicKey.toBase58()) {
@@ -50,7 +54,7 @@ export async function GET(req: Request) {
         }
 
         // 6. Execute Ping as Delegate
-        await (program.methods as any)
+        await program.methods
             .ping()
             .accounts({
                 vault: vaultPubkey,
@@ -61,17 +65,19 @@ export async function GET(req: Request) {
         // 7. Redirect to success page
         return NextResponse.redirect(new URL('/check-in-success', req.url));
 
-    } catch (error: any) {
+    } catch (error) {
         console.error("Magic Ping Failed:", error);
 
         // Handle specific error types
-        if (error.message?.includes('expired') || error.message?.includes('Invalid')) {
-            return NextResponse.json({ error: error.message }, { status: 401 });
+        // Handle specific error types
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        if (message.includes('expired') || message.includes('Invalid')) {
+            return NextResponse.json({ error: message }, { status: 401 });
         }
 
         return NextResponse.json({
             error: 'Check-in failed.',
-            details: error.message
+            details: message
         }, { status: 500 });
     }
 }

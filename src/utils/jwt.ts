@@ -28,6 +28,7 @@ export function verifyMagicLinkToken(token: string): MagicLinkPayload {
     try {
         const decoded = jwt.verify(token, JWT_SECRET) as MagicLinkPayload;
         return decoded;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         if (error.name === 'TokenExpiredError') {
             throw new Error('Magic link has expired. Please request a new one.');

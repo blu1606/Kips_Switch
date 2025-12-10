@@ -10,6 +10,7 @@ export async function GET() {
         return NextResponse.json({
             publicKey: keypair.publicKey.toBase58()
         });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         console.error("Failed to get server keypair:", error.message);
         return NextResponse.json({

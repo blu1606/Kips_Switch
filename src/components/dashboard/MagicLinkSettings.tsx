@@ -39,6 +39,7 @@ const MagicLinkSettings: FC<MagicLinkSettingsProps> = ({ vault, initialEnabled, 
 
             // Dynamic import to avoid SSR issues with IDL loading if any
             const idl = await import('@/idl/deadmans_switch.json');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const program = new Program(idl as any, provider);
 
             const newEnabled = !magicLinkEnabled;
@@ -58,6 +59,7 @@ const MagicLinkSettings: FC<MagicLinkSettingsProps> = ({ vault, initialEnabled, 
             }
 
             // 1. Update Delegate on Contract
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (program.methods as any)
                 .setDelegate(delegateKey) // setDelegate accepts Option<Pubkey> so null is fine
                 .accounts({
@@ -71,7 +73,7 @@ const MagicLinkSettings: FC<MagicLinkSettingsProps> = ({ vault, initialEnabled, 
             if (typeof window !== 'undefined') {
                 localStorage.setItem(`magic_link_${vault.publicKey.toBase58()}`, String(newEnabled));
             }
-
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             console.error("Failed to toggle magic link", e);
             onError("Failed to update Magic Link: " + e.message);

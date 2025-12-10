@@ -90,6 +90,7 @@ export async function POST(req: Request) {
             longestStreak
         });
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         console.error('Streak API error:', err);
         return NextResponse.json({ error: 'Internal error' }, { status: 500 });

@@ -7,11 +7,13 @@ import VaultCard from '@/components/claim/VaultCard';
 import ClaimModal from '@/components/claim/ClaimModal';
 import { useRecipientVaults } from '@/hooks/useRecipientVaults';
 
+import { VaultData } from '@/utils/solanaParsers';
+
 export default function ClaimPage() {
     const { connected } = useWallet();
     const { vaults, loading, error, refetch } = useRecipientVaults();
 
-    const [selectedVault, setSelectedVault] = useState<any | null>(null);
+    const [selectedVault, setSelectedVault] = useState<VaultData | null>(null);
 
     if (!connected) {
         return (
@@ -29,7 +31,7 @@ export default function ClaimPage() {
 
     return (
         <main className="min-h-screen pt-20 pb-10 px-4">
-            <div className="max-w-4xl mx-auto">
+            <div className="container mx-auto max-w-7xl">
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold">Claim Legacies</h1>
@@ -48,7 +50,7 @@ export default function ClaimPage() {
                         <button onClick={refetch} className="btn-secondary">Try Again</button>
                     </div>
                 ) : vaults.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {vaults.map((item) => (
                             <VaultCard
                                 key={item.publicKey.toBase58()}

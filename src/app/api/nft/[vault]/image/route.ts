@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { Program, AnchorProvider } from '@coral-xyz/anchor';
+import { AnchorProvider, Idl } from '@coral-xyz/anchor';
+import { DeadmansSwitch, VaultAccount } from '@/types/deadmans-switch';
+
 
 /**
  * Dynamic NFT Image API
@@ -14,7 +16,7 @@ import { Program, AnchorProvider } from '@coral-xyz/anchor';
 
 type SpiritState = 'happy' | 'neutral' | 'sick' | 'ghost';
 
-function getSpiritState(vault: any): SpiritState {
+function getSpiritState(vault: VaultAccount): SpiritState {
     if (vault.isReleased) {
         return 'ghost';
     }
@@ -56,13 +58,13 @@ export async function GET(
 
         // Load the program IDL
         const idl = await import('@/idl/deadmans_switch.json');
-        const programId = new PublicKey(idl.address);
+        // const programId = new PublicKey(idl.address);
 
         // Create a read-only provider (no wallet needed for reading)
-        const provider = {
-            connection,
-            publicKey: null,
-        };
+        // const provider = {
+        //     connection,
+        //     publicKey: null,
+        // };
 
         // Fetch the vault account data directly
         const accountInfo = await connection.getAccountInfo(vaultPubkey);
@@ -75,7 +77,7 @@ export async function GET(
 
         // Parse the vault data manually (simplified - assumes standard layout)
         // A proper implementation would use the Anchor program for decoding
-        const data = accountInfo.data;
+        // const data = accountInfo.data;
 
         // Try to determine state from raw data
         // Vault struct layout (approximate offsets):
@@ -102,8 +104,10 @@ export async function GET(
                 { commitment: 'confirmed' }
             );
 
-            const program = new Program(idl as any, readProvider);
-            const vault = await (program.account as any).vault.fetch(vaultPubkey);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const program = new Program<DeadmansSwitch>(idl as unknown as Idl, readProvider);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const vault = await (program.account as any).vault.fetch(vaultPubkey) as VaultAccount;
 
             spiritState = getSpiritState(vault);
         } catch (e) {
@@ -116,17 +120,17 @@ export async function GET(
         const baseUrl = request.nextUrl.origin;
         return NextResponse.redirect(`${baseUrl}/spirits/${spiritState}.png`);
 
-    } catch (error: any) {
+    } catch (error) {
         console.error('Spirit NFT API error:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch vault state', details: error.message },
+            { error: 'Failed to fetch vault state', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }
 }
 
 // Also provide metadata endpoint for NFT standards
-export async function HEAD(request: NextRequest) {
+export async function HEAD() {
     return new NextResponse(null, {
         headers: {
             'Content-Type': 'image/png',

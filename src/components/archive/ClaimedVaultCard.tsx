@@ -4,6 +4,7 @@ import { FC } from 'react';
 import { ClaimedVaultRecord } from '@/hooks/useClaimedVaults';
 import { formatDate, truncateAddress } from '@/lib/utils';
 import { getItemIcon, formatFileSize } from '@/utils/vaultBundle';
+import { VaultItemType } from '@/types/vaultBundle';
 
 interface ClaimedVaultCardProps {
     vault: ClaimedVaultRecord;
@@ -38,7 +39,7 @@ const ClaimedVaultCard: FC<ClaimedVaultCardProps> = ({ vault, onView, onExport }
                     <div className="flex -space-x-1">
                         {vault.contentSummary.types.slice(0, 3).map((type, i) => (
                             <span key={i} className="w-6 h-6 rounded-full bg-dark-800 border border-dark-700 flex items-center justify-center text-xs" title={type}>
-                                {getItemIcon(type as any)}
+                                {getItemIcon(type as VaultItemType)}
                             </span>
                         ))}
                         {vault.contentSummary.types.length > 3 && (

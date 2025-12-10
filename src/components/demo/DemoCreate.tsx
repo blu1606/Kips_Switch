@@ -47,7 +47,7 @@ export default function DemoCreate() {
                             className="w-full bg-dark-800 border border-dark-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-primary-500 focus:outline-none placeholder:text-dark-600"
                         />
                         <p className="text-[10px] text-dark-500 mt-2">
-                            *In this simulation, we'll pretend to send it here.
+                            *In this simulation, we&apos;ll pretend to send it here.
                         </p>
                     </div>
 

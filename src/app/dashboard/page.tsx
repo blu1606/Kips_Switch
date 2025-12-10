@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { PublicKey } from '@solana/web3.js';
 import { useOwnerVaults, VaultData } from '@/hooks/useVault';
 import { useWallet } from '@solana/wallet-adapter-react';
 import WalletButton from '@/components/wallet/WalletButton';
@@ -37,7 +38,7 @@ export default function DashboardPage() {
                     const res = await fetch(`/api/vault/streak?vault=${vault.publicKey.toBase58()}`);
                     const data = await res.json();
                     streakData[vault.publicKey.toBase58()] = data.streak || 0;
-                } catch (e) {
+                } catch {
                     streakData[vault.publicKey.toBase58()] = 0;
                 }
             })
@@ -77,6 +78,7 @@ export default function DashboardPage() {
 
             setPingSuccess(vaultKey);
             setTimeout(() => setPingSuccess(null), 3000);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             setPingError(err.message || 'Failed to check in');
         } finally {
@@ -245,7 +247,7 @@ export default function DashboardPage() {
             {lockingVault && (
                 <LockTokensModal
                     vaultAddress={lockingVault.publicKey}
-                    existingMint={lockingVault.tokenMint ? new (require('@solana/web3.js')).PublicKey(lockingVault.tokenMint) : undefined}
+                    existingMint={lockingVault.tokenMint ? new PublicKey(lockingVault.tokenMint) : undefined}
                     onClose={() => setLockingVault(null)}
                     onSuccess={() => {
                         setLockingVault(null);
