@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import dynamic from 'next/dynamic';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 // Dynamic import wallet provider to avoid SSR issues
 const WalletContextProvider = dynamic(
@@ -63,6 +64,7 @@ export default function RootLayout({
                         {children}
                     </div>
                 </WalletContextProvider>
+                <SpeedInsights />
             </body>
         </html>
     );
