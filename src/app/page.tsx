@@ -11,6 +11,7 @@ import UseCaseGrid from '@/components/landing/UseCaseGrid';
 import FAQSection from '@/components/landing/FAQSection';
 import WhatIfSimulator from '@/components/landing/WhatIfSimulator';
 import TrustBadges from '@/components/landing/TrustBadges';
+import PricingSection from '@/components/landing/PricingSection';
 
 export default function Home() {
     const { connected } = useWallet();
@@ -199,6 +200,8 @@ export default function Home() {
                     </div>
                 </div>
             </section>
+
+            <PricingSection />
 
             <FAQSection />
 

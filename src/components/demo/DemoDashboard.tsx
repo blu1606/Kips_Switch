@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { AlertTriangle, CheckCircle, FastForward, FileText, Image, File, Lock, Unlock } from 'lucide-react';
+import { AlertTriangle, CheckCircle, FastForward, FileText, Image as ImageIcon, File, Lock, Unlock } from 'lucide-react';
+import Image from 'next/image';
 import { DemoState, UploadedFileInfo } from '@/hooks/useDemoVault';
 import confetti from 'canvas-confetti';
 import KipAvatar from '@/components/brand/KipAvatar';
@@ -46,7 +47,7 @@ export default function DemoDashboard({
     }, [isReleased, confettiFired]);
 
     const getFileIcon = (type: string) => {
-        if (type.startsWith('image/')) return <Image className="w-6 h-6" />;
+        if (type.startsWith('image/')) return <ImageIcon className="w-6 h-6" />;
         if (type.startsWith('text/')) return <FileText className="w-6 h-6" />;
         return <File className="w-6 h-6" />;
     };
@@ -88,10 +89,13 @@ export default function DemoDashboard({
                             {/* File Content */}
                             {uploadedFile.type.startsWith('image/') ? (
                                 <div className="relative">
-                                    <img
+                                    <Image
                                         src={uploadedFile.dataUrl}
                                         alt="Decrypted content"
-                                        className="max-h-48 mx-auto rounded-lg shadow-lg"
+                                        width={400}
+                                        height={300}
+                                        className="max-h-48 w-auto mx-auto rounded-lg shadow-lg object-contain"
+                                        unoptimized
                                     />
                                 </div>
                             ) : uploadedFile.type.startsWith('text/') ? (

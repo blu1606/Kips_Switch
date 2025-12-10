@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Upload, User, Clock, Shield, AlertTriangle, Loader2, FileText, Image, File } from 'lucide-react';
+import { ArrowRight, Upload, User, Clock, Shield, AlertTriangle, Loader2, FileText, Image as ImageIcon, File } from 'lucide-react';
+import Image from 'next/image';
 import { UploadedFileInfo } from '@/hooks/useDemoVault';
 
 interface DemoCreateProps {
@@ -68,7 +69,7 @@ export default function DemoCreate({ onCreate, onFileUpload, onStepChange, uploa
     }, [onFileUpload]);
 
     const getFileIcon = (type: string) => {
-        if (type.startsWith('image/')) return <Image className="w-8 h-8" />;
+        if (type.startsWith('image/')) return <ImageIcon className="w-8 h-8" />;
         if (type.startsWith('text/')) return <FileText className="w-8 h-8" />;
         return <File className="w-8 h-8" />;
     };
@@ -141,10 +142,13 @@ export default function DemoCreate({ onCreate, onFileUpload, onStepChange, uploa
                                                 <p className="text-dark-400 text-sm">{(uploadedFile.size / 1024).toFixed(1)} KB</p>
                                             </div>
                                             {uploadedFile.type.startsWith('image/') && (
-                                                <img
+                                                <Image
                                                     src={uploadedFile.dataUrl}
                                                     alt="Preview"
-                                                    className="max-h-32 mx-auto rounded-lg"
+                                                    width={200}
+                                                    height={200}
+                                                    className="max-h-32 w-auto mx-auto rounded-lg object-contain"
+                                                    unoptimized
                                                 />
                                             )}
                                             <p className="text-green-400 text-sm">✓ Ready to encrypt</p>

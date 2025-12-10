@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -53,6 +54,9 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
     // Typewriter State
     const [displayedText, setDisplayedText] = useState('');
     const [showContinue, setShowContinue] = useState(false);
+
+    // Gasless Claim Detection (Premium Feature)
+    const isGaslessEligible = vault?.gasTank && new BN(vault.gasTank).gt(new BN(0));
 
     // Detect encryption mode
     useEffect(() => {
@@ -336,7 +340,7 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
         }
         if (mediaUrl) {
             if (fileType.startsWith('image/')) {
-                return <img src={mediaUrl} alt="Decrypted" className="max-w-full max-h-[300px] mx-auto rounded-lg" />;
+                return <Image src={mediaUrl} alt="Decrypted" width={500} height={300} className="max-w-full max-h-[300px] w-auto h-auto mx-auto rounded-lg object-contain" unoptimized />;
             }
             if (fileType.startsWith('video/')) {
                 return <video src={mediaUrl} controls className="w-full max-h-[300px] rounded-lg" />;
@@ -395,6 +399,21 @@ export default function ClaimModal({ vault, onClose, onSuccess }: ClaimModalProp
                                         />
                                     </div>
                                 </div>
+
+                                {/* Gasless Claim Indicator */}
+                                {isGaslessEligible && (
+                                    <div className="mb-6 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-xl p-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center">
+                                                <span className="text-xl">⚡</span>
+                                            </div>
+                                            <div>
+                                                <p className="text-amber-400 font-medium">Premium Vault</p>
+                                                <p className="text-dark-400 text-sm">Gas fees are pre-paid. Claim for free!</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Encryption Mode Info */}
                                 <div className="mb-6">
