@@ -15,6 +15,7 @@ export interface VaultFormData {
     // Encryption mode
     encryptionMode: 'password' | 'wallet';
     password?: string; // Only for password mode
+    passwordHint?: string; // Optional hint for password mode
 
     // Step 2: Recipient
     recipientAddress: string;

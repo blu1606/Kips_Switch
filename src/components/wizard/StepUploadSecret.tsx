@@ -17,6 +17,7 @@ const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext, onBack 
     const [encryptionMode, setEncryptionMode] = useState<'wallet' | 'password'>(formData.encryptionMode || 'wallet');
     const [password, setPassword] = useState(formData.password || '');
     const [confirmPassword, setConfirmPassword] = useState(formData.password || '');
+    const [passwordHint, setPasswordHint] = useState(formData.passwordHint || '');
     const [error, setError] = useState<string | null>(null);
 
     // Calculate content readiness based on bundle items
@@ -49,6 +50,7 @@ const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext, onBack 
             updateFormData({
                 encryptionMode: 'password',
                 password: password,
+                passwordHint: passwordHint,
                 aesKeyBase64: 'password-protected' // Placeholder
             });
         } else {
@@ -132,6 +134,22 @@ const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext, onBack 
                                 placeholder="Repeat password"
                             />
                         </div>
+
+                        {/* Password Hint */}
+                        <div>
+                            <label className="block text-xs text-dark-400 mb-1">Password Hint (Optional)</label>
+                            <input
+                                type="text"
+                                value={passwordHint}
+                                onChange={(e) => setPasswordHint(e.target.value)}
+                                className="w-full bg-dark-900 border border-dark-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary-500 font-normal"
+                                placeholder="E.g., Favorite childhood pet..."
+                            />
+                            <p className="text-[10px] text-dark-500 mt-1">
+                                This will be visible to the recipient <strong>before</strong> they decrypt. Do not put the password here.
+                            </p>
+                        </div>
+
                         <p className="text-xs text-yellow-500/80">
                             ⚠️ You must share this password with your recipient via another channel.
                         </p>

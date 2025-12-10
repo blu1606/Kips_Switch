@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { DemoState } from '@/hooks/useDemoVault';
 import { useEffect, useState } from 'react';
+import { KIP_MESSAGES, getRandomMessage } from '@/data/messages/kip';
 
 interface TutorialBotProps {
     state: DemoState;
@@ -37,34 +38,32 @@ const getContextKey = (state: DemoState, timer: number, createStep: number): str
     return state;
 };
 
+
 // Educational messages
 const getKipMessage = (state: DemoState, timer: number, createStep: number) => {
     if (state === 'CREATING') {
-        const messages: Record<number, string> = {
-            1: "Upload any file - image, text, anything. I'll encrypt it with AES-256, the same standard protecting government secrets. 🔐",
-            2: "Who should inherit this? The decryption key will be locked in a Solana smart contract. Only they can unlock it. 👤",
-            3: "What if someone forces you? Hold check-in for 5 seconds → Silent Alarm. Looks normal, secretly alerts your contacts. 🛡️",
-            4: "The Deadman's Switch: No check-in = automatic release. No company. No admin. Pure trustless protocol on blockchain. ⛓️",
-            5: "Ready to deploy! Your vault will be immutable on Solana. This is Digital Immortality. 🚀"
-        };
-        return messages[createStep] || "Setting up your vault...";
+        const stepKey = `STEP_${createStep}` as keyof typeof KIP_MESSAGES.CREATING;
+        // Fallback if step is out of bounds
+        if (!KIP_MESSAGES.CREATING[stepKey]) return "Setting up your vault...";
+
+        return getRandomMessage('CREATING', stepKey);
     }
 
     if (state === 'LIVE' && timer <= 5 && timer > 0) {
         return `⚡ Hurry! Only ${timer}s left! Check in now or the protocol executes!`;
     }
 
-    const MESSAGES: Record<DemoState, string> = {
-        IDLE: "Hello! I'm Kip. Ready to see how your digital legacy works in 60 seconds?",
-        CLAIMING: "Look! You found a vault from Agent 007. That vault used AES-256 encryption - completely unreadable until now. Click to claim! 🔍",
-        CREATING: "Your turn! Let's create an encrypted vault.",
-        LIVE: "Your vault is now on-chain! The timer is running. Check in to prove you're okay - or the protocol will execute. ⏰",
-        DYING: "😱 Protocol triggered! In production, your beneficiary would receive the decryption key right now...",
-        RELEASED: "🎉 Vault opened! Your encrypted file has been decrypted. This is Digital Immortality."
-    };
-
-    return MESSAGES[state];
+    // Default states
+    switch (state) {
+        case 'IDLE': return getRandomMessage('IDLE');
+        case 'CLAIMING': return getRandomMessage('CLAIMING');
+        case 'LIVE': return getRandomMessage('LIVE', 'HEALTHY'); // Default health for demo
+        case 'DYING': return getRandomMessage('DYING');
+        case 'RELEASED': return getRandomMessage('RELEASED');
+        default: return "System ready.";
+    }
 };
+
 
 export default function TutorialBot({ state, timer, createStep = 1 }: TutorialBotProps) {
     const [currentMessage, setCurrentMessage] = useState(getKipMessage(state, timer, createStep));

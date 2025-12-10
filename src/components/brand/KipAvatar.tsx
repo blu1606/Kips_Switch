@@ -132,6 +132,38 @@ export default function KipAvatar({
                 />
             )}
 
+            {/* Health Ring */}
+            {!isReleased && (
+                <svg className="absolute inset-[-8px] w-[calc(100%+16px)] h-[calc(100%+16px)] -rotate-90 pointer-events-none overflow-visible">
+                    {/* Track */}
+                    <circle
+                        className="text-white/10"
+                        strokeWidth="3"
+                        stroke="currentColor"
+                        fill="transparent"
+                        r="48%"
+                        cx="50%"
+                        cy="50%"
+                    />
+                    {/* Indicator */}
+                    <motion.circle
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        fill="transparent"
+                        r="48%"
+                        cx="50%"
+                        cy="50%"
+                        style={{
+                            stroke: state === 'critical' ? '#EF4444' : state === 'hungry' ? '#EAB308' : '#10B981',
+                            filter: `drop-shadow(0 0 2px ${state === 'critical' ? '#EF4444' : state === 'hungry' ? '#EAB308' : '#10B981'})`
+                        }}
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: health / 100 }}
+                        transition={{ duration: 1.5, ease: "easeOut" }}
+                    />
+                </svg>
+            )}
+
             {/* Main Body */}
             <motion.div
                 className="relative w-full h-full rounded-full flex items-center justify-center z-10"
