@@ -2,7 +2,7 @@
 import dynamic from 'next/dynamic';
 import { KipMoodProvider } from '@/context/KipMoodContext';
 import LandingHeroInteractions from '@/components/landing/LandingHeroInteractions';
-import StoryIsland from '@/components/landing/StoryIsland';
+
 import ProblemSectionWrapper from '@/components/landing/ProblemSectionWrapper';
 
 // --- Dynamic Imports for below-the-fold content ---
@@ -19,7 +19,7 @@ const EmergencySwitch = dynamic(() => import('@/components/landing/EmergencySwit
 
 export default function Home() {
     return (
-        <main className="min-h-screen relative overflow-hidden">
+        <main className="min-h-screen relative overflow-x-hidden">
 
             {/* Ambient Background - Static CSS/Divs are fine in RSC */}
             <div className="absolute inset-0 pointer-events-none">
@@ -27,8 +27,7 @@ export default function Home() {
                 <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-secondary-500/5 rounded-full blur-[120px] animate-pulse-slow" style={{ animationDelay: '2s' }} />
             </div>
 
-            {/* Storyteller Island - Client Component (assumed, or simple enough to stay) */}
-            <StoryIsland />
+
 
             <KipMoodProvider>
                 {/* Hero Section - now encapsulated for interactivity */}
