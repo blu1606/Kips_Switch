@@ -1,6 +1,6 @@
 # 📋 Hackathon To-Do: Optimized Execution Order
 
-> **Updated:** 2025-12-11T12:12
+> **Updated:** 2025-12-11T13:58
 > **Goal:** Ship demo-ready features in optimal order
 > **Model Guide:** 🎨 Gemini = UI/UX | ⚡ Claude = Logic | 🛡️ Opus = Critical
 
@@ -8,20 +8,18 @@
 
 ## 🔥 P1: Quick Wins (Demo-Critical)
 
-*(All P1 tasks completed! 🎉)*
+- [ ] **9.8** Fix AI Timer JSON Output (Harden Prompt) 🧠 Thinking
 
 ---
 
 ## 🔥 P2: Core Features
 
+- [ ] **13.4** FCP/LCP Optimization: Land Page RSC Refactor 🎨 Gemini
 - [ ] **13.1** Migrate useVault to TanStack Query ⚡ Claude
-- [ ] **13.5** Landing Page Polish: Icons & "Locked Cloud" Visual 🎨 Gemini
-- [x] **12.3.1** Kip Smart Life-Force Ring (Shared `LifeForceRing` Component) 🎨 Gemini
-- [x] **12.3.2** Kip Check-In Micro-interaction (Confetti/Happy State) 🎨 Gemini
-- [ ] **12.3.3** Landing: Active Hero ("Paper Mario" CSS 3D Style) 🎨 Gemini
-- [ ] **12.3.4** Landing: Reactive Hovers (Button/Section reactions) 🎨 Gemini
-- [ ] **12.3.4** Landing: Reactive Hovers (Button/Section reactions) 🎨 Gemini
-- [ ] **12.3.5** Landing: Storyteller ("Dynamic Island" Top Pill) 🎨 Gemini
+- [x] **13.5** Landing Page Polish: Icons & "Locked Cloud" Visual 🎨 Gemini
+- [x] **12.3.3** Landing: Active Hero ("Paper Mario" CSS 3D Style) 🎨 Gemini
+- [x] **12.3.4** Landing: Reactive Hovers (Button/Section reactions) 🎨 Gemini
+- [x] **12.3.5** Landing: Storyteller ("Dynamic Island" Top Pill) 🎨 Gemini
 - [ ] **12.3.6** Kip Gamification: Streak Counter & Fire UI 🔥 Gemini
 
 ---
@@ -37,8 +35,6 @@
 - [ ] **11.1** Guardian Key Sharding (SSS Implementation) 🛡️ Opus
 - [ ] **11.2.1** Gasless claim relayer design 🛡️ Opus
 - [ ] **11.2.2** Gasless claim UI integration 🎨 Gemini
-
----
 
 ---
 
@@ -71,6 +67,6 @@
 
 ## 📈 Progress
 
-**Completed (this session):** 11 tasks ✅ (PERF.1, PERF.2, 8.4, 12.1.3, SEC.2, 13.2-13.4, 9.7.1-9.7b)
-**Remaining:** 8 tasks
+**Completed (this session):** 13 tasks ✅ (PERF.1, PERF.2, 8.4, 12.1.3, SEC.2, 13.2-13.4, 9.7.1-9.7b, 12.3.1, 12.3.2)
+**Remaining:** 9 tasks
 **Est. Time:** 1-2 days

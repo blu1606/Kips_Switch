@@ -9,6 +9,12 @@
 import { generateWithGroq, isGroqAvailable } from './groq';
 import { generateWithGemini, isGeminiAvailable } from './gemini';
 
+// DEBUG LOGGING
+console.log('[AI Provider] Loaded. Env Check:', {
+    GROQ_KEY_EXISTS: !!process.env.GROQ_API_KEY,
+    GEMINI_KEY_EXISTS: !!process.env.GOOGLE_AI_API_KEY,
+});
+
 export interface AIGenerateOptions {
     maxTokens?: number;
     temperature?: number;

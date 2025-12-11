@@ -28,7 +28,7 @@ export interface AIGenerateOptions {
     systemPrompt?: string;
 }
 
-const DEFAULT_MODEL = 'llama-3.1-70b-versatile';
+const DEFAULT_MODEL = 'llama-3.1-8b-instant';
 
 /**
  * Generate text completion using Groq

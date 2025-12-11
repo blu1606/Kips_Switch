@@ -67,7 +67,7 @@ const StepSetInterval: FC<Props> = ({ formData, updateFormData, onNext, onBack }
             } else {
                 setParseError(data.error || 'Could not understand duration');
             }
-        } catch (err) {
+        } catch {
             setParseError('Failed to parse duration');
         } finally {
             setIsParsing(false);

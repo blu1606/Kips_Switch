@@ -11,8 +11,13 @@ import WhatIfSimulator from '@/components/landing/WhatIfSimulator';
 import TrustBadges from '@/components/landing/TrustBadges';
 import PricingSection from '@/components/landing/PricingSection';
 import EmergencySwitch from '@/components/landing/EmergencySwitch';
+import StoryIsland from '@/components/landing/StoryIsland';
+
+import { useState } from 'react';
+import PaperMarioKip from '@/components/landing/PaperMarioKip';
 
 export default function Home() {
+    const [kipMood, setKipMood] = useState<'neutral' | 'happy' | 'sad' | 'excited' | 'scared'>('neutral');
 
     return (
         <main className="min-h-screen relative overflow-hidden">
@@ -21,6 +26,9 @@ export default function Home() {
                 <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary-500/5 rounded-full blur-[120px] animate-pulse-slow" />
                 <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-secondary-500/5 rounded-full blur-[120px] animate-pulse-slow" style={{ animationDelay: '2s' }} />
             </div>
+
+            {/* Storyteller Island */}
+            <StoryIsland />
 
 
             {/* Split Screen Hero */}
@@ -63,7 +71,12 @@ export default function Home() {
                             </p>
 
                             <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                                <Link href="/create" className="btn-primary text-lg px-8 py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-primary-900/20 hover:shadow-primary-500/20 transition-all group">
+                                <Link
+                                    href="/create"
+                                    onMouseEnter={() => setKipMood('excited')}
+                                    onMouseLeave={() => setKipMood('neutral')}
+                                    className="btn-primary text-lg px-8 py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-primary-900/20 hover:shadow-primary-500/20 transition-all group"
+                                >
                                     <span>Secure My Legacy</span>
                                     <Shield className="w-5 h-5 group-hover:scale-110 transition-transform" />
                                 </Link>
@@ -94,7 +107,7 @@ export default function Home() {
 
                             {/* "After" Card (Main Focus) */}
                             <motion.div
-                                className="absolute top-20 right-20 w-full max-w-md bg-dark-800/90 backdrop-blur-xl rounded-3xl border border-primary-500/30 p-8 shadow-2xl shadow-primary-900/20"
+                                className="absolute top-20 right-20 w-full max-w-md bg-dark-800/90 backdrop-blur-xl rounded-3xl border border-primary-500/30 p-8 shadow-2xl shadow-primary-900/20 z-10"
                                 initial={{ opacity: 0, y: 50 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.4 }}
@@ -137,6 +150,16 @@ export default function Home() {
                                     </Link>
                                 </div>
                             </motion.div>
+
+                            {/* Kip Active Hero - Floating near the card */}
+                            <motion.div
+                                className="absolute -top-10 -right-4 z-20 pointer-events-none"
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.8, type: "spring" }}
+                            >
+                                <PaperMarioKip mood={kipMood} className="scale-75 lg:scale-100" />
+                            </motion.div>
                         </div>
                     </div>
                 </div>
@@ -145,7 +168,12 @@ export default function Home() {
 
 
             {/* NEW SECTIONS for Phase 8.1 */}
-            <ProblemSection />
+            <div
+                onMouseEnter={() => setKipMood('scared')}
+                onMouseLeave={() => setKipMood('neutral')}
+            >
+                <ProblemSection />
+            </div>
 
             <div id="mechanism">
                 <EmergencySwitch />

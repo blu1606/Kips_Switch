@@ -16,33 +16,9 @@ interface ParseTimerRequest {
     input: string;
 }
 
-const SYSTEM_PROMPT = `You are a precise time duration parser. 
-Convert the user's natural language input into TOTAL SECONDS.
+import { TIMER_PARSING_PROMPT } from '@/lib/ai/prompts';
 
-Rules:
-1. Return ONLY a JSON object: {"seconds": number, "visualization": "string"}
-2. "visualization" should be a human-readable confirmation (e.g., "30 days")
-3. If the input is invalid or not a time duration, return {"seconds": 0, "error": "Could not understand duration"}
-4. Assume standard conversions:
-   - 1 minute = 60 seconds
-   - 1 hour = 3600 seconds
-   - 1 day = 86400 seconds
-   - 1 week = 604800 seconds
-   - 1 month = 30 days (2592000 seconds)
-   - 1 year = 365 days (31536000 seconds)
-   
-Examples:
-Input: "3 months"
-Output: {"seconds": 7776000, "visualization": "90 days"}
-
-Input: "half a year"
-Output: {"seconds": 15768000, "visualization": "6 months (182.5 days)"}
-
-Input: "tomorrow"
-Output: {"seconds": 86400, "visualization": "24 hours"}
-
-Input: "banana"
-Output: {"seconds": 0, "error": "Not a valid time duration"}`;
+const SYSTEM_PROMPT = TIMER_PARSING_PROMPT;
 
 export async function POST(request: NextRequest) {
     try {
@@ -72,8 +48,10 @@ export async function POST(request: NextRequest) {
 
         // Parse JSON from AI response
         try {
-            const cleanText = result.text.replace(/```json|```/g, '').trim();
-            const parsed = JSON.parse(cleanText);
+            // Robust extraction: Find first '{' and last '}'
+            const jsonMatch = result.text.match(/\{[\s\S]*\}/);
+            const jsonStr = jsonMatch ? jsonMatch[0] : result.text.replace(/```json|```/g, '').trim();
+            const parsed = JSON.parse(jsonStr);
             return NextResponse.json({
                 ...parsed,
                 provider: result.provider,

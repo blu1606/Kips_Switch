@@ -58,8 +58,8 @@ const StepUploadSecret: FC<Props> = ({ formData, updateFormData, onNext, onBack 
             } else {
                 setError(data.error || 'Failed to generate hint');
             }
-        } catch (err) {
-            setError('Failed to contact AI');
+        } catch {
+            setError('Failed to generate hint');
         } finally {
             setIsGeneratingHint(false);
         }

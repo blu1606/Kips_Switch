@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { CloudOff, Lock, Clock, AlertOctagon } from 'lucide-react';
+import { CloudOff, Lock, Clock, AlertOctagon, Wallet, FileX, ShieldAlert } from 'lucide-react';
 
 
 export default function ProblemSection() {
@@ -18,21 +18,33 @@ export default function ProblemSection() {
                     <div className="relative h-[400px] rounded-3xl overflow-hidden glass-panel flex flex-col items-center justify-center p-8 group">
 
                         {/* The Icon Visual */}
-                        <div className="relative mb-8">
+                        <div className="relative mb-8 w-48 h-48 flex items-center justify-center">
+                            {/* Background Cloud Layers */}
                             <motion.div
-                                animate={{ opacity: [0.5, 0.8, 0.5] }}
-                                transition={{ duration: 4, repeat: Infinity }}
+                                className="absolute inset-0 text-dark-800"
+                                animate={{ opacity: [0.3, 0.6, 0.3], scale: [0.95, 1.05, 0.95] }}
+                                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                             >
-                                <CloudOff className="w-40 h-40 text-dark-700" strokeWidth={1} />
+                                <CloudOff className="w-full h-full" strokeWidth={1} />
                             </motion.div>
 
+                            {/* Grid Scan Effect */}
                             <motion.div
-                                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-dark-900 rounded-full p-4 border border-red-500/30 shadow-2xl shadow-red-900/20"
-                                initial={{ scale: 0.8 }}
-                                animate={{ scale: 1 }}
+                                className="absolute inset-0 bg-gradient-to-b from-transparent via-red-500/10 to-transparent z-10"
+                                animate={{ top: ["-100%", "100%"] }}
+                                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                                style={{ maskImage: 'linear-gradient(to bottom, transparent, black, transparent)' }}
+                            />
+
+                            {/* Floating Lock */}
+                            <motion.div
+                                className="relative z-20 bg-dark-900/90 backdrop-blur-md rounded-2xl p-6 border border-red-500/30 shadow-[0_0_50px_-12px_rgba(239,68,68,0.5)]"
+                                initial={{ scale: 0.9 }}
+                                animate={{ scale: 1, boxShadow: ["0 0 20px -5px rgba(239,68,68,0.3)", "0 0 50px -12px rgba(239,68,68,0.6)", "0 0 20px -5px rgba(239,68,68,0.3)"] }}
                                 transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
                             >
                                 <Lock className="w-12 h-12 text-red-500" />
+                                <div className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-red-500 animate-pulse" />
                             </motion.div>
                         </div>
 
@@ -82,22 +94,28 @@ export default function ProblemSection() {
                         </p>
 
                         <div className="space-y-4">
-                            <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
-                                <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center mt-1 text-red-400 shrink-0">✕</div>
+                            <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/5 group/item">
+                                <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center mt-1 text-red-400 shrink-0 group-hover/item:bg-red-500/20 group-hover/item:scale-110 transition-all">
+                                    <Wallet className="w-5 h-5" />
+                                </div>
                                 <div>
                                     <p className="text-white font-medium">Your family can&apos;t access your wallet.</p>
                                     <p className="text-sm text-dark-400">Ledgers and phrases are useless if they can&apos;t find them.</p>
                                 </div>
                             </div>
-                            <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
-                                <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center mt-1 text-red-400 shrink-0">✕</div>
+                            <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/5 group/item">
+                                <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center mt-1 text-red-400 shrink-0 group-hover/item:bg-red-500/20 group-hover/item:scale-110 transition-all">
+                                    <ShieldAlert className="w-5 h-5" />
+                                </div>
                                 <div>
                                     <p className="text-white font-medium">Cloud drives are encrypted.</p>
                                     <p className="text-sm text-dark-400">Apple/Google won&apos;t unlock them without a court order.</p>
                                 </div>
                             </div>
-                            <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
-                                <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center mt-1 text-red-400 shrink-0">✕</div>
+                            <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/5 group/item">
+                                <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center mt-1 text-red-400 shrink-0 group-hover/item:bg-red-500/20 group-hover/item:scale-110 transition-all">
+                                    <FileX className="w-5 h-5" />
+                                </div>
                                 <div>
                                     <p className="text-white font-medium">Final words left unsaid.</p>
                                     <p className="text-sm text-dark-400">Important messages or instructions that never get delivered.</p>

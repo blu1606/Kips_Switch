@@ -1,4 +1,3 @@
-'use client';
 
 /**
  * SafetyScanner - Client-side content scanner for sensitive data detection

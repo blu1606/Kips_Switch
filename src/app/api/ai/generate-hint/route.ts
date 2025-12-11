@@ -21,16 +21,9 @@ interface GenerateHintRequest {
     recipient?: string;
 }
 
-const SYSTEM_PROMPT = `You are helping create a password hint for a digital inheritance vault.
-Your goal is to help the recipient remember or guess the password without revealing it.
+import { HINT_GENERATION_PROMPT } from '@/lib/ai/prompts';
 
-Rules:
-1. NEVER include the actual password in the hint
-2. Reference shared memories, inside jokes, or family knowledge
-3. Be warm and personal in tone
-4. Keep the hint under 50 words
-5. If the context mentions specific names/dates, use them indirectly
-6. The hint should be a riddle or memory prompt, not a direct clue`;
+const SYSTEM_PROMPT = HINT_GENERATION_PROMPT;
 
 /**
  * Scrub sensitive data from input before sending to AI
@@ -158,7 +151,7 @@ Generate a single hint that will help them remember without giving the password 
     } catch (error) {
         console.error('[API] generate-hint error:', error);
         return NextResponse.json(
-            { error: 'Failed to generate hint' },
+            { error: `Failed to generate hint: ${error instanceof Error ? error.message : String(error)}` },
             { status: 500 }
         );
     }

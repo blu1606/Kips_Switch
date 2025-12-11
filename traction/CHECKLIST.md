@@ -91,7 +91,7 @@
 - [/] Implementation
     - [x] 12.3 Kip Expansion (Health Bar, Dialogue)
     - [x] 12.1 Recipient Journey (Password-first Claim + Hint)
-    - [x] BugFix: Claim & Close validation + error messages
+    - [x] 12.3 Landing: Paper Mario Hero, Reactive Hovers, Storyteller
 
 ### Phase 13: System Optimization (NEW)
 - [ ] 13.1 Data Fetching Architecture (TanStack Query)
@@ -99,6 +99,8 @@
 - [ ] Implementation
     - [x] 13.3 Performance Fixes (CSS/Animation)
     - [x] 13.4 Security Hardening (JWT/RLS)
+    - [x] 13.5 Landing Page Polish (Icons & Locked Cloud)
+    - [ ] 13.4 FCP/LCP Optimization (RSC Refactor)
 
 
 ---
@@ -117,7 +119,7 @@
 | Brand Identity | ✅ Done | 100% |
 | Create Vault UX | ✅ Done | 100% |
 | Phase 4: Automation | ⏳ Near | 90% |
-| **Phase 9: AI** | ⏳ In Progress | **90%** |
+| **Phase 9: AI** | ⏳ Polish | **95%** |
 | Phase 11: Premium | 📝 Spec | 0% |
 | **Phase 12: UX** | ✅ Done | **100%** |
 | Phase 13: Optimization | ⏳ In Progress | **75%** |
