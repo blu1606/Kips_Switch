@@ -15,6 +15,7 @@
 ### Phase 2: Encryption & Storage ✅ 100%
 - [x] 2.1 AES-256-GCM encryption
 - [x] 2.2 IPFS/Pinata integration
+
 - [x] 2.3 Create vault wizard
 
 ### Phase 3: Recipient Claim ✅ 100%
@@ -24,6 +25,7 @@
 
 ### Phase 6: Future Roadmap ✅ 100%
 - [x] 6.1 Frictionless Check-in (Delegate)
+- [ ] 6.1b Solana Blinks (Twitter Check-in)
 - [x] 6.2 Cinematic Reveal
 - [x] 6.3 Tamagotchi Vault (Kip)
 - [x] 6.5 Silent Alarm (Duress Mode)
@@ -82,6 +84,7 @@
 - [x] 11.1 Guardian Key Sharding (SSS)
 - [x] 11.2 Gas Station Network (Gasless Claim)
 - [ ] Implementation
+- [ ] 11.3 Key Sharding Demo Improvements (Badge + Real sss)
 
 ### Phase 12: UX Enhancement (NEW)
 - [x] 12.1 Recipient Onboarding Journey (P0)
@@ -93,14 +96,19 @@
     - [x] 12.3 Landing: Paper Mario Hero, Reactive Hovers, Storyteller
 
 ### Phase 13: System Optimization (NEW)
-- [ ] 13.1 Data Fetching Architecture (TanStack Query)
+- [x] 13.1 Data Fetching Architecture (TanStack Query)
 - [x] 13.2 Bundle & Render Optimization (Dynamic Imports)
 - [ ] Implementation
     - [x] 13.3 Performance Fixes (CSS/Animation)
     - [x] 13.4 Security Hardening (JWT/RLS)
     - [x] 13.5 Landing Page Polish (Icons & Locked Cloud)
-    - [ ] 13.4 FCP/LCP Optimization (RSC Refactor)
+    - [x] 13.4 FCP/LCP Optimization (RSC Refactor)
 
+### Phase 14: Testing & Reliability (NEW)
+- [ ] 14.1 Smart Contract Testing (Bankrun)
+- [ ] 14.2 Unit Testing (Vitest)
+- [ ] 14.3 Integration Testing (API)
+- [ ] 14.4 E2E Testing (Playwright)
 
 ---
 
@@ -139,7 +147,6 @@
 - 6.4 Council of Guardians
 - 7.3 Email Magic Link
 - 6.3 Dynamic NFT / Metaplex
-- 6.1 Solana Blinks
 - 12.2 Multi-Recipient Vault
 - **14.1 Telegram "Guardian" Bot** (Check-in via DM)
 - **14.2 Passive Wallet Watcher** (Auto-check-in via TX activity)

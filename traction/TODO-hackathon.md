@@ -1,6 +1,6 @@
 # 📋 Hackathon To-Do: Optimized Execution Order
 
-> **Updated:** 2025-12-11T14:35
+> **Updated:** 2025-12-12T10:30
 > **Goal:** Ship demo-ready features in optimal order
 > **Model Guide:** 🎨 Gemini = UI/UX | ⚡ Claude = Logic | 🛡️ Opus = Critical
 
@@ -8,29 +8,33 @@
 
 ## 🔥 P1: Quick Wins (Demo-Critical)
 
-- [x] **9.8** Fix AI Timer JSON Output (Harden Prompt) 🧠 Thinking ✅
+- [ ] **9.5** Write Assist (Prompt + AI Modal) 🎨 Gemini
 
 ---
 
 ## 🔥 P2: Core Features
 
-- [x] **13.4** FCP/LCP Optimization: Land Page RSC Refactor 🎨 Gemini
-- [x] **13.1** Migrate useVault to TanStack Query ⚡ Claude ✅
-- [x] **12.3.6** Kip Gamification: Streak Counter & Fire UI 🔥 Gemini
 
+- [ ] **9.6** Write Assist UX (Gradient, Typewriter, Tone Cards) 🎨 Gemini
+- [ ] **6.1b** Solana Blinks (Action API) 🎨 Gemini
 ---
 
 ## 🟡 P3: Polish (If Time)
 
-*(All P3 tasks completed! 🎉)*
+- [x] **R.1** Refactor `VaultContentEditor` (God Component) 🎨 Gemini
+- [ ] **A.1** Refactor `StepUploadSecret` (Decompose) 🎨 Gemini
+- [ ] **A.2** Add Wizard Error Boundary 🛡️ Opus
+- [ ] **A.2** Add Wizard Error Boundary 🛡️ Opus
+- [ ] **14.1** Smart Contract Test (Bankrun) ⚡ Claude
+- [ ] **14.2** Unit Test (Crypto/Utils) ⚡ Claude
+- [ ] **14.4** E2E Test (Playwright) ⚡ Claude
 
 ---
 
 ## 💎 P4: Premium Features
 
-- [x] **11.1** Guardian Key Sharding (SSS Implementation) 🛡️ Opus ✅
-- [x] **11.2.1** Gasless claim relayer design 🛡️ Opus ✅
-- [x] **11.2.2** Gasless claim UI integration 🎨 Gemini ✅
+
+- [ ] **11.3** Key Sharding Demo Improvements (Badge + Real Math) 🛡️ Opus
 
 ---
 
@@ -46,7 +50,7 @@
 - [ ] **4.4** Mainnet deploy prep 🛡️ Opus
 - [ ] **12.2** Multi-recipient vaults ⚡ Claude
 - [ ] **11.1b** Full SSS recovery UI 🎨 Gemini
-- [ ] **9.5** Write Assist 🎨 Gemini
+
 - [ ] **6.4** Council of Guardians (DAO) 🛡️ Opus
 - [ ] **7.3** Email Magic Link (Auth) ⚡ Claude
 - [ ] **6.3** Dynamic NFT / Metaplex 🛡️ Opus
@@ -69,6 +73,6 @@
 
 ## 📈 Progress
 
-**Completed (this session):** 17 tasks ✅
-**Remaining:** 9 tasks
+**Completed (this session):** 24 tasks ✅
+**Remaining:** 3 tasks
 **Est. Time:** 1-2 days
