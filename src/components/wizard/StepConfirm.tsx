@@ -41,7 +41,6 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
 
     // Guardian Protection state (11.1 Premium Feature)
     const [guardianEnabled, setGuardianEnabled] = useState(false);
-    const [shards, setShards] = useState<string[]>([]);
 
     // Anti-Doxxer: Security alert state
     const [securityAlert, setSecurityAlert] = useState<{
@@ -381,7 +380,6 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
                             masterKey={formData.aesKeyBase64 || 'demo-key-12345'}
                             recipientEmail={recipientEmail || 'recipient@example.com'}
                             onComplete={(generatedShards) => {
-                                setShards(generatedShards);
                                 console.log('[Guardian] Shards generated:', generatedShards.length);
                             }}
                         />

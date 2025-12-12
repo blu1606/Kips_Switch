@@ -1,12 +1,23 @@
 import jwt from 'jsonwebtoken';
 
-// SECURITY: JWT_SECRET is REQUIRED in production. Fail-fast if missing.
-const isProduction = process.env.NODE_ENV === 'production';
-if (isProduction && !process.env.JWT_SECRET) {
-    throw new Error('FATAL: JWT_SECRET environment variable is required in production!');
-}
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-DO-NOT-USE-IN-PRODUCTION';
 const JWT_EXPIRY = '7d'; // Magic links valid for 7 days
+
+/**
+ * Get JWT secret with validation.
+ * Lazy load to avoid build-time errors.
+ */
+function getJWTSecret(): string {
+    const secret = process.env.JWT_SECRET;
+    // Only fail in production runtime, not during build
+    if (!secret && process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
+        // Log warning but don't throw during build (checking for Next.js build phase)
+        if (process.env.NEXT_PHASE !== 'phase-production-build') {
+            throw new Error('FATAL: JWT_SECRET environment variable is required in production!');
+        }
+        return 'build-time-placeholder';
+    }
+    return secret || 'dev-secret-DO-NOT-USE-IN-PRODUCTION';
+}
 
 export interface MagicLinkPayload {
     vault: string;
@@ -22,7 +33,7 @@ export function generateMagicLinkToken(vaultAddress: string): string {
         vault: vaultAddress,
     };
 
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRY });
+    return jwt.sign(payload, getJWTSecret(), { expiresIn: JWT_EXPIRY });
 }
 
 /**
@@ -31,7 +42,7 @@ export function generateMagicLinkToken(vaultAddress: string): string {
  */
 export function verifyMagicLinkToken(token: string): MagicLinkPayload {
     try {
-        const decoded = jwt.verify(token, JWT_SECRET) as MagicLinkPayload;
+        const decoded = jwt.verify(token, getJWTSecret()) as MagicLinkPayload;
         return decoded;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
