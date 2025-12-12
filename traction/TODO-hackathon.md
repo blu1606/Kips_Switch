@@ -1,6 +1,6 @@
 # 📋 Hackathon To-Do: Optimized Execution Order
 
-> **Updated:** 2025-12-12T17:10
+> **Updated:** 2025-12-12T21:55
 > **Goal:** Ship demo-ready features in optimal order
 > **Model Guide:** 🎨 Gemini = UI/UX | ⚡ Claude = Logic | 🛡️ Opus = Critical
 
@@ -8,31 +8,29 @@
 
 ## 🔥 P1: Quick Wins (Demo-Critical)
 
-- [x] **9.5** Write Assist (Prompt + AI Modal) 🎨 Gemini ✅
+*(All P1 items completed! 🎉)*
 
 ---
 
 ## 🔥 P2: Core Features
 
+*(All P2 items completed! 🎉)*
 
-- [x] **9.6** Write Assist UX (Gradient, Typewriter, Tone Cards) 🎨 Gemini ✅
-- [x] **6.1b** Solana Blinks (Action API) 🎨 Gemini ✅
 ---
 
 ## 🟡 P3: Polish (If Time)
 
-- [x] **R.1** Refactor `VaultContentEditor` (God Component) 🎨 Gemini
-- [ ] **A.1** Refactor `StepUploadSecret` (Decompose) 🎨 Gemini
-- [ ] **A.2** Add Wizard Error Boundary 🛡️ Opus
-- [ ] **A.2** Add Wizard Error Boundary 🛡️ Opus
+- [x] **13.5** DAS API Migration (Supabase Index) ⚡ Claude
+- [x] **T.3** Anchor Coder IDL Parsing 🧠 Thinking
 - [ ] **14.1** Smart Contract Test (Bankrun) ⚡ Claude
-- [ ] **14.2** Unit Test (Crypto/Utils) ⚡ Claude
+- [ ] **14.2** Unit Testing (Vitest) ⚡ Claude
+- [/] **14.3** Integration Testing (Vault Service spec) ⚡ Claude
 - [ ] **14.4** E2E Test (Playwright) ⚡ Claude
+- [ ] **A.2** Add Wizard Error Boundary 🛡️ Opus
 
 ---
 
 ## 💎 P4: Premium Features
-
 
 - [ ] **11.3** Key Sharding Demo Improvements (Badge + Real Math) 🛡️ Opus
 
@@ -73,7 +71,6 @@
 
 ## 📈 Progress
 
-**Completed (this session):** 27 tasks ✅
-**Remaining:** 0 P1/P2 tasks (only P3-P5 polish/deferred items)
-**Est. Time:** Ready for demo video
-
+**Completed (Cumulative):** 35 tasks ✅
+**Remaining:** 0 P1/P2 tasks, 6 P3/P4 tasks
+**Est. Time:** Ready for verification & video

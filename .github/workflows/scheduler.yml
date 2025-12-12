@@ -1,0 +1,33 @@
+name: Deadman Scheduler
+
+on:
+  schedule:
+    # Run every hour at minute 0
+    - cron: '0 * * * *'
+  workflow_dispatch: # Manual trigger from GitHub UI
+
+jobs:
+  check-vaults:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Trigger Cron API
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${{ secrets.NEXT_PUBLIC_APP_URL }}/api/cron/check-status" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json")
+          
+          echo "Response code: $response"
+          
+          if [ "$response" -ne 200 ]; then
+            echo "❌ Cron API failed with status $response"
+            exit 1
+          fi
+          
+          echo "✅ Cron job executed successfully"
+
+      - name: Log result
+        if: always()
+        run: echo "Cron completed at $(date -u +"%Y-%m-%dT%H:%M:%SZ")"

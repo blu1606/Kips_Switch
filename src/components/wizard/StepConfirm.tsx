@@ -11,6 +11,8 @@ import { createEmptyBundle, bundleToBlob } from '@/utils/vaultBundle';
 import { scanForSecrets, ScanResult } from '@/utils/safetyScanner';
 import SecurityAlertModal from '@/components/ui/SecurityAlertModal';
 import KeyShardingDemo from '@/components/premium/KeyShardingDemo';
+import { indexVault } from '@/services/vault';
+
 
 interface Props {
     formData: VaultFormData;
@@ -197,7 +199,15 @@ const StepConfirm: FC<Props> = ({ formData, onBack, onSuccess }) => {
 
             setTxSignature(tx);
 
+            // Save contacts and index vault in Supabase
             await saveContacts(vaultPda.toBase58());
+
+            // Index vault for fast lookup (DAS API Migration)
+            await indexVault(
+                vaultPda.toBase58(),
+                publicKey.toBase58(),
+                formData.recipientAddress
+            );
 
             setStatus('success');
 

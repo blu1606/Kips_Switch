@@ -80,34 +80,40 @@
 
 ## 📝 Spec Ready (Not Started)
 
-### Phase 11: Premium Features
-- [x] 11.1 Guardian Key Sharding (SSS)
-- [x] 11.2 Gas Station Network (Gasless Claim)
-- [ ] Implementation
-- [ ] 11.3 Key Sharding Demo Improvements (Badge + Real sss)
+### Phase 11: Premium Features (In Progress)
+- [x] 11.1 Guardian Key Sharding (Mockup)
+- [x] 11.2 Gas Station Network (API Only)
+- [ ] 11.3 Key Sharding Demo Improvements (Real SSS Strategy)
 
-### Phase 12: UX Enhancement (NEW)
+### Phase 12: UX Enhancement (In Progress)
 - [x] 12.1 Recipient Onboarding Journey (P0)
 - [x] 12.2 Multi-Recipient Vault (P2 - v2)
-- [x] 12.3 Kip Expansion (P1)
-- [/] Implementation
-    - [x] 12.3 Kip Expansion (Health Bar, Dialogue)
+- [x] 12.3 Kip Expansion (Health Bar, Dialogue)
+- [ ] Implementation Polish
     - [x] 12.1 Recipient Journey (Password-first Claim + Hint)
     - [x] 12.3 Landing: Paper Mario Hero, Reactive Hovers, Storyteller
 
-### Phase 13: System Optimization (NEW)
+### Phase 13: System Optimization (In Progress)
 - [x] 13.1 Data Fetching Architecture (TanStack Query)
 - [x] 13.2 Bundle & Render Optimization (Dynamic Imports)
-- [ ] Implementation
-    - [x] 13.3 Performance Fixes (CSS/Animation)
-    - [x] 13.4 Security Hardening (JWT/RLS)
-    - [x] 13.5 Landing Page Polish (Icons & Locked Cloud)
-    - [x] 13.4 FCP/LCP Optimization (RSC Refactor)
+- [x] 13.3 Performance Fixes (CSS/Animation)
+- [x] 13.4 Security Hardening (JWT/RLS)
+- [x] 13.5 DAS API Migration (Supabase Index)
+- [x] 13.6 Landing Page Polish (Icons & Locked Cloud)
+- [x] 13.4 FCP/LCP Optimization (RSC Refactor)
 
-### Phase 14: Testing & Reliability (NEW)
+### Refactor & Tech Debt (In Progress)
+- [x] R.1 Refactor `VaultContentEditor` (God Component)
+- [x] R.2 Wizard Robustness
+- [x] R.3 Write Assist & Blinks Modularization
+- [x] T.1 Cron & Scalability (GitHub Actions + Safe Parser)
+- [x] T.2 Cron Service Layerization (Scanner/Classifier/Notification)
+- [x] T.3 Anchor Coder IDL Parsing
+
+### Phase 14: Testing & Reliability (Spec Ready)
 - [ ] 14.1 Smart Contract Testing (Bankrun)
 - [ ] 14.2 Unit Testing (Vitest)
-- [ ] 14.3 Integration Testing (API)
+- [/] 14.3 Integration Testing (Vault Service spec added)
 - [ ] 14.4 E2E Testing (Playwright)
 
 ---
@@ -129,7 +135,7 @@
 | **Phase 9: AI** | ⏳ Polish | **95%** |
 | Phase 11: Premium | 📝 Spec | 0% |
 | **Phase 12: UX** | ✅ Done | **100%** |
-| Phase 13: Optimization | ⏳ In Progress | **75%** |
+| Phase 13: Optimization | ✅ Done | **100%** |
 
 ---
 

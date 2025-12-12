@@ -1,4 +1,4 @@
-import { FC, useRef } from 'react';
+import { FC } from 'react';
 
 interface UploadActionsProps {
     onAddText: () => void;

@@ -4,6 +4,10 @@ import { BN } from '@coral-xyz/anchor';
 // Program ID - Update this after deploying to devnet
 export const PROGRAM_ID = new PublicKey('HnFEhMS84CabpztHCDdGGN8798NxNse7NtXW4aG17XpB');
 
+// Discriminators
+export const PING_DISCRIMINATOR = Buffer.from([173, 0, 94, 236, 73, 133, 225, 153]);
+export const VAULT_DISCRIMINATOR = Buffer.from([211, 8, 232, 43, 2, 152, 117, 119]);
+
 // Network configuration
 export const NETWORK = 'devnet' as const;
 export const RPC_ENDPOINT = clusterApiUrl(NETWORK);

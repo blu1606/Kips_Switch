@@ -10,6 +10,7 @@ import StepConfirm from '@/components/wizard/StepConfirm';
 import TemplateSelector from '@/components/wizard/TemplateSelector';
 import WalletButton from '@/components/wallet/WalletButton';
 import { useCreateVaultState } from '@/hooks/useCreateVaultState';
+import { WizardErrorBoundary } from '@/components/ui/WizardErrorBoundary';
 
 export default function CreateVaultPage() {
     const { connected } = useWallet();
@@ -90,40 +91,42 @@ export default function CreateVaultPage() {
 
                 {/* Content */}
                 <div className="animate-fade-in">
-                    {currentStep === 0 && (
-                        <TemplateSelector onSelect={setTemplateInterval} />
-                    )}
-                    {currentStep === 1 && (
-                        <StepUploadSecret
-                            formData={formData}
-                            updateFormData={updateFormData}
-                            onNext={nextStep}
-                            onBack={prevStep}
-                        />
-                    )}
-                    {currentStep === 2 && (
-                        <StepSetRecipient
-                            formData={formData}
-                            updateFormData={updateFormData}
-                            onNext={nextStep}
-                            onBack={prevStep}
-                        />
-                    )}
-                    {currentStep === 3 && (
-                        <StepSetInterval
-                            formData={formData}
-                            updateFormData={updateFormData}
-                            onNext={nextStep}
-                            onBack={prevStep}
-                        />
-                    )}
-                    {currentStep === 4 && (
-                        <StepConfirm
-                            formData={formData}
-                            onBack={prevStep}
-                            onSuccess={handleSuccess}
-                        />
-                    )}
+                    <WizardErrorBoundary>
+                        {currentStep === 0 && (
+                            <TemplateSelector onSelect={setTemplateInterval} />
+                        )}
+                        {currentStep === 1 && (
+                            <StepUploadSecret
+                                formData={formData}
+                                updateFormData={updateFormData}
+                                onNext={nextStep}
+                                onBack={prevStep}
+                            />
+                        )}
+                        {currentStep === 2 && (
+                            <StepSetRecipient
+                                formData={formData}
+                                updateFormData={updateFormData}
+                                onNext={nextStep}
+                                onBack={prevStep}
+                            />
+                        )}
+                        {currentStep === 3 && (
+                            <StepSetInterval
+                                formData={formData}
+                                updateFormData={updateFormData}
+                                onNext={nextStep}
+                                onBack={prevStep}
+                            />
+                        )}
+                        {currentStep === 4 && (
+                            <StepConfirm
+                                formData={formData}
+                                onBack={prevStep}
+                                onSuccess={handleSuccess}
+                            />
+                        )}
+                    </WizardErrorBoundary>
                 </div>
             </div>
         </main>

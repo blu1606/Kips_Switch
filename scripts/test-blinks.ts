@@ -1,7 +1,7 @@
 /**
  * Manual Test Script for Solana Blinks API
  * 
- * Usage: npx ts-node scripts/test-blinks.ts
+ * Usage: npx tsx scripts/test-blinks.ts
  */
 
 const API_URL = 'http://localhost:3000/api/actions/ping';

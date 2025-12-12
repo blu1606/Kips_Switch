@@ -47,8 +47,8 @@ export function useVaultContent({ items, onItemsChange, maxItems }: UseVaultCont
             try {
                 const item = await fileToVaultItem(file);
                 onItemsChange([...items, item]);
-            } catch (err: any) {
-                setError(err.message);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to process file');
             }
         }
 
@@ -65,8 +65,8 @@ export function useVaultContent({ items, onItemsChange, maxItems }: UseVaultCont
             const file = new File([blob], `Recording_${Date.now()}.webm`, { type: blob.type || 'audio/webm' });
             const item = await fileToVaultItem(file);
             onItemsChange([...items, item]);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to save recording');
         }
     };
 
