@@ -105,14 +105,22 @@
 ### Refactor & Tech Debt (In Progress)
 - [x] R.1 Refactor `VaultContentEditor` (God Component)
 - [x] R.2 Wizard Robustness
-- [x] R.3 Write Assist & Blinks Modularization
+- [x] R.2 Wizard Robustness
 - [x] T.1 Cron & Scalability (GitHub Actions + Safe Parser)
 - [x] T.2 Cron Service Layerization (Scanner/Classifier/Notification)
 - [x] T.3 Anchor Coder IDL Parsing
 
 ### Phase 14: Testing & Reliability (Spec Ready)
-- [ ] 14.1 Smart Contract Testing (Bankrun)
-- [ ] 14.2 Unit Testing (Vitest)
+- [/] 14.1 Smart Contract Testing (Bankrun) - 10/30 tests (33%)
+  - [x] 14.1a Setup Bankrun + Happy Path (2 tests)
+  - [x] 14.1b P0 Security Tests (3 tests)
+  - [x] 14.1c P1 Core Functionality (3 tests)
+  - [x] 14.1d P2 Edge Cases (2 tests)
+  - [ ] 14.1e Complete P0 (2 remaining)
+  - [ ] 14.1f Complete P1 (2 remaining)
+  - [ ] 14.1g Complete P2 (7 remaining)
+  - [ ] 14.1h SPL Token Tests (9 tests, T.2 dependency)
+- [x] 14.2 Unit Testing (Vitest)
 - [/] 14.3 Integration Testing (Vault Service spec added)
 - [ ] 14.4 E2E Testing (Playwright)
 

@@ -22,11 +22,16 @@
 
 - [x] **13.5** DAS API Migration (Supabase Index) ⚡ Claude
 - [x] **T.3** Anchor Coder IDL Parsing 🧠 Thinking
-- [ ] **14.1** Smart Contract Test (Bankrun) ⚡ Claude
-- [ ] **14.2** Unit Testing (Vitest) ⚡ Claude
+- [/] **14.1** Smart Contract Test (Bankrun) - 17/30 (57%) ⚡ Claude
+  - [x] **14.1a-d** Setup + P0/P1/P2 Tests (10 tests)
+  - [~] **14.1e** Complete P0 Security (2 tests skipped - Bankrun limitations)
+  - [x] **14.1f** Complete P1 Core (2 tests)
+  - [x] **14.1g** Complete P2 Edge (5 tests)
+  - [ ] **14.1h** SPL Token Tests (9 tests) - P4
+- [x] **14.2** Unit Testing (Vitest) ⚡ Claude
 - [/] **14.3** Integration Testing (Vault Service spec) ⚡ Claude
 - [ ] **14.4** E2E Test (Playwright) ⚡ Claude
-- [ ] **A.2** Add Wizard Error Boundary 🛡️ Opus
+- [x] **A.2** Add Wizard Error Boundary 🛡️ Opus
 
 ---
 
@@ -71,6 +76,6 @@
 
 ## 📈 Progress
 
-**Completed (Cumulative):** 35 tasks ✅
-**Remaining:** 0 P1/P2 tasks, 6 P3/P4 tasks
+**Completed (Cumulative):** 37 tasks ✅
+**Remaining:** 0 P1/P2 tasks, 4 P3/P4 tasks
 **Est. Time:** Ready for verification & video

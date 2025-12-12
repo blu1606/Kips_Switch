@@ -173,8 +173,8 @@ export function scanForSecrets(text: string): ScanResult {
             // For key patterns, also verify high entropy
             if (pattern.type === 'solana_key' || pattern.type === 'evm_key') {
                 const entropy = calculateEntropy(trimmed);
-                // Keys typically have entropy > 4
-                if (entropy < 4) continue;
+                // Keys typically have entropy > 3.5 (Hex max is 4, Base58 is ~5.8)
+                if (entropy < 3.5) continue;
             }
 
             return {
