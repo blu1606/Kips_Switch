@@ -19,10 +19,21 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-jetbrains-mono' });
 
 export const metadata: Metadata = {
-    title: "Deadman's Switch | Digital Inheritance & Crypto Emergency Protocol",
-    description: 'Secure your digital legacy. Automated crypto inheritance, whistleblower insurance, and self-custody backup on Solana. Decentralized and immutable.',
+    title: 'KipSwitch | Digital Guardian on Solana',
+    description: 'KipSwitch is an automated dead man\'s switch on Solana. It monitors your activity and executes your improved will or transfers assets if you go inactive.',
+    openGraph: {
+        title: 'KipSwitch | Digital Guardian on Solana',
+        description: 'Secure your legacy on-chain. Automated, keyless, and reliable.',
+        url: 'https://kipswitch.vercel.app/',
+        siteName: 'KipSwitch',
+    },
     keywords: ['solana', 'digital legacy', 'crypto inheritance', 'dead man switch', 'whistleblower switch', 'key recovery', 'self-custody backup', 'web3 estate planning'],
     manifest: '/manifest.json',
+    icons: {
+        icon: '/icon_1.png',
+        shortcut: '/icon_1.png',
+        apple: '/icon_1.png',
+    },
 };
 
 export const viewport: Viewport = {
@@ -46,7 +57,7 @@ export default function RootLayout({
                         __html: JSON.stringify({
                             "@context": "https://schema.org",
                             "@type": "SoftwareApplication",
-                            "name": "Deadman's Switch Protocol",
+                            "name": "KipSwitch Protocol",
                             "applicationCategory": "FinanceApplication",
                             "operatingSystem": "Web",
                             "description": "A decentralized dead man's switch on Solana for secure digital inheritance and crypto self-custody backup.",

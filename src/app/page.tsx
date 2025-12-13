@@ -22,7 +22,7 @@ export default function Home() {
         <main className="min-h-screen relative overflow-x-hidden">
 
             {/* Ambient Background - Static CSS/Divs are fine in RSC */}
-            <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary-500/5 rounded-full blur-[120px] animate-pulse-slow" />
                 <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-secondary-500/5 rounded-full blur-[120px] animate-pulse-slow" style={{ animationDelay: '2s' }} />
             </div>
@@ -79,7 +79,7 @@ export default function Home() {
             {/* Footer Minimal */}
             <footer className="py-8 text-center border-t border-white/5 bg-dark-900">
                 <p className="text-dark-600 text-xs font-mono uppercase tracking-widest opacity-60">
-                    Protocol v0.6 • Deadman&apos;s Switch • Solana
+                    Protocol v0.6 • KipSwitch • Solana
                 </p>
             </footer>
         </main>

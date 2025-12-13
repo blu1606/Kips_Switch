@@ -1,6 +1,6 @@
 {
-    "name": "Deadman's Switch Protocol",
-    "short_name": "Deadman Switch",
+    "name": "KipSwitch Protocol",
+    "short_name": "KipSwitch",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#020617",
