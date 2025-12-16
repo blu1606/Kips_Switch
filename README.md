@@ -3,7 +3,7 @@
 > **The Tamagotchi for your Digital Legacy.**  
 > *Built for Solana Consumer Hackathon Track*
 
-[![Solana](https://img.shields.io/badge/Solana-Mainnet-linear_gradient?logo=solana&color=9945FF)](https://solana.com)
+[![Solana](https://img.shields.io/badge/Solana-Devnet-linear_gradient?logo=solana&color=9945FF)](https://solana.com)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
