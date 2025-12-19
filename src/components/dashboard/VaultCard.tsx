@@ -78,7 +78,7 @@ const VaultCard: FC<VaultCardProps> = ({
         };
 
         fetchDecimals();
-    }, [vault.tokenMint, vault.lockedTokens, connection]);
+    }, [vault.tokenMint, vault.lockedTokens.toString(), connection]);
 
     const formatLabel = (seconds: number) => {
         if (seconds <= 0) return "EXPIRED";

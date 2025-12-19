@@ -1,8 +1,7 @@
-'use client';
-
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, Connection } from '@solana/web3.js';
+import { useQuery } from '@tanstack/react-query';
 import { parseVaultAccount, VaultData } from '@/utils/solanaParsers';
 
 /**
@@ -12,21 +11,11 @@ import { parseVaultAccount, VaultData } from '@/utils/solanaParsers';
 export function useVaultByAddress(address: string | null) {
     const { connection } = useConnection();
 
-    const [vault, setVault] = useState<VaultData | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const { data: vault = null, isLoading, error, refetch: queryRefetch } = useQuery({
+        queryKey: ['vault', address, connection.rpcEndpoint],
+        queryFn: async () => {
+            if (!address) return null;
 
-    const fetchVault = useCallback(async () => {
-        if (!address) {
-            setVault(null);
-            setLoading(false);
-            return;
-        }
-
-        setLoading(true);
-        setError(null);
-
-        try {
             const pubkey = new PublicKey(address);
             const accountInfo = await connection.getAccountInfo(pubkey);
 
@@ -34,21 +23,22 @@ export function useVaultByAddress(address: string | null) {
                 throw new Error('Vault not found');
             }
 
-            const parsed = parseVaultAccount(pubkey, accountInfo.data as Buffer);
-            setVault(parsed);
-        } catch (err) {
-            console.error('Failed to fetch vault:', err);
-            setError(err instanceof Error ? err.message : 'Failed to load vault');
-        } finally {
-            setLoading(false);
-        }
-    }, [address, connection]);
+            return parseVaultAccount(pubkey, accountInfo.data as Buffer);
+        },
+        enabled: !!address,
+        staleTime: 30 * 1000,
+    });
 
-    useEffect(() => {
-        fetchVault();
-    }, [fetchVault]);
+    const refetch = useCallback(async () => {
+        await queryRefetch();
+    }, [queryRefetch]);
 
-    return { vault, loading, error, refetch: fetchVault };
+    return {
+        vault,
+        loading: isLoading,
+        error: error instanceof Error ? error.message : error ? 'Failed to load vault' : null,
+        refetch
+    };
 }
 
 /**

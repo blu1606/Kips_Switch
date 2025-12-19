@@ -1,10 +1,8 @@
-'use client';
-
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { useUnifiedWallet as useWallet } from '@/hooks/useUnifiedWallet';
 import { PublicKey } from '@solana/web3.js';
-
+import { useQuery } from '@tanstack/react-query';
 import { PROGRAM_ID } from '@/utils/anchor';
 
 import { VaultData } from '@/utils/solanaParsers';
@@ -19,21 +17,11 @@ export function useRecipientVaults() {
     const { publicKey } = useWallet();
     const { connection } = useConnection();
 
-    const [vaults, setVaults] = useState<VaultAccountData[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const { data: vaults = [], isLoading, error, refetch: queryRefetch } = useQuery({
+        queryKey: ['recipientVaults', publicKey?.toBase58()],
+        queryFn: async () => {
+            if (!publicKey) return [];
 
-    const fetchVaults = useCallback(async () => {
-        if (!publicKey) {
-            setVaults([]);
-            setLoading(false);
-            return;
-        }
-
-        setLoading(true);
-        setError(null);
-
-        try {
             // Direct raw account fetch with Memcmp filter
             // Recipient is at offset 8 (discriminator) + 32 (owner) = 40
             const accounts = await connection.getProgramAccounts(PROGRAM_ID, {
@@ -47,30 +35,25 @@ export function useRecipientVaults() {
                 ],
             });
 
-
-
-            // Wait for all parses (if lazy loaded) or just import top level.
-            // Since we're inside the function, let's fix the import.
-            // Actually, let's just use the import from top level.
             const { parseVaultAccount } = await import('@/utils/solanaParsers');
 
-            const results = accounts.map(acc => ({
+            return accounts.map(acc => ({
                 publicKey: acc.pubkey,
                 account: parseVaultAccount(acc.pubkey, acc.account.data)
             }));
+        },
+        enabled: !!publicKey,
+        staleTime: 60 * 1000, // 1 minute
+    });
 
-            setVaults(results);
-        } catch (err) {
-            console.error('Failed to fetch recipient vaults:', err);
-            setError('Failed to load vaults.');
-        } finally {
-            setLoading(false);
-        }
-    }, [publicKey, connection]);
+    const refetch = useCallback(async () => {
+        await queryRefetch();
+    }, [queryRefetch]);
 
-    useEffect(() => {
-        fetchVaults();
-    }, [fetchVaults]);
-
-    return { vaults, loading, error, refetch: fetchVaults };
+    return {
+        vaults,
+        loading: isLoading,
+        error: error instanceof Error ? error.message : error ? 'Failed to load vaults.' : null,
+        refetch
+    };
 }
