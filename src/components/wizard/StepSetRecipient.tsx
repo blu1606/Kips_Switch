@@ -2,7 +2,7 @@
 
 import { FC, useState, useCallback, useEffect } from 'react';
 import { PublicKey } from '@solana/web3.js';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useUnifiedWallet as useWallet } from '@/hooks/useUnifiedWallet';
 import { VaultFormData } from '@/types/vaultForm';
 
 interface Props {

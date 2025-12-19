@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useUnifiedWallet as useWallet } from '@/hooks/useUnifiedWallet';
 import { useRouter } from 'next/navigation';
 import StepUploadSecret from '@/components/wizard/StepUploadSecret';
 import StepSetRecipient from '@/components/wizard/StepSetRecipient';

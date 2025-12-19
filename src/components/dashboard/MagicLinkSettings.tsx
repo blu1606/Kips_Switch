@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
-import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { useConnection } from '@solana/wallet-adapter-react';
+import { useUnifiedWallet as useWallet } from '@/hooks/useUnifiedWallet';
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
 
 interface MagicLinkSettingsProps {

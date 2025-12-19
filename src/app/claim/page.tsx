@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useUnifiedWallet as useWallet } from '@/hooks/useUnifiedWallet';
 import WalletButton from '@/components/wallet/WalletButton';
 import VaultCard from '@/components/claim/VaultCard';
 import ClaimModal from '@/components/claim/ClaimModal';

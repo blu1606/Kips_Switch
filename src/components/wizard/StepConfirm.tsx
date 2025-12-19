@@ -1,7 +1,8 @@
 'use client';
 
 import { FC, useState } from 'react';
-import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { useConnection } from '@solana/wallet-adapter-react';
+import { useUnifiedWallet as useWallet } from '@/hooks/useUnifiedWallet';
 import { PublicKey, SystemProgram } from '@solana/web3.js';
 import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
 import { VaultFormData } from '@/types/vaultForm';

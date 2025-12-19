@@ -6,4 +6,3 @@ next-env.d.ts
 next.config.js
 yarn.lock
 platform-wallet.json
-.agent

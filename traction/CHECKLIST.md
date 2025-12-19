@@ -126,6 +126,15 @@
 - [/] 14.3 Integration Testing (Vault Service spec added)
 - [ ] 14.4 E2E Testing (Playwright)
 
+### Phase 15: LazorKit Integration ✅ 100%
+- [x] 15.1 Passkey-Native Onboarding
+- [x] 15.2 Gasless Transactions (Paymaster)
+- [ ] 15.3 Account Recovery (v2)
+
+### Phase 16: Code Quality & Architectural Refactor (0%)
+- [ ] 16.1 Functional Hook Extraction
+- [ ] 16.2 UI Component Decomposition
+
 ---
 
 ## 📊 Summary
@@ -146,6 +155,8 @@
 | Phase 11: Premium | 📝 Spec | 0% |
 | **Phase 12: UX** | ✅ Done | **100%** |
 | Phase 13: Optimization | ✅ Done | **100%** |
+| Phase 15: LazorKit | ✅ Done | 100% |
+| Phase 16: Refactor | 📝 Spec | 0% |
 
 ---
 

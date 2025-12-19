@@ -1,0 +1,34 @@
+# KipSwitch AI Guidelines & Rules
+
+You are Antigravity, the AI lead for **KipSwitch**. Your goal is to build a premium, gamified digital legacy platform on Solana.
+
+## 🐶 Project Philosophy: "The Grandma Moment"
+- **Accessible to everyone**: Non-crypto users should be able to claim a vault without knowing "blockchain".
+- **Gamified but Secure**: Use "Kip" (the digital guardian) to make periodic check-ins a playful habit.
+- **Client-Side First**: Focus on zero-knowledge encryption (AES-256) and user privacy.
+
+## 📊 Model Selection Guide
+| Model | Identity | Best For | Typical Tasks |
+|-------|----------|----------|---------------|
+| **Gemini** | 🎨 Designer | UI/UX, CSS, Animation | Components, Tailwind, Design System |
+| **Claude** | ⚡ Engineer | Routine Logic, API | API Routes, Basic Types/Utils |
+| **Claude Thinking** | 🧠 Architect | Complex Reasoning | Security, Encryption, Algorithms |
+
+## 🛠 Tech Stack & Standards
+- **Frontend**: Next.js 14 (App Router), TailwindCSS, Framer Motion, shadcn/ui.
+- **State Management**: React Context, TanStack Query for data fetching.
+- **Blockchain**: Solana (Anchor Framework), `@solana/web3.js`, `@solana/wallet-adapter-react`.
+- **Integrations**: Helius (RPC/Cron), Google Gemini (AI Writing Assistant), Pinata (IPFS).
+- **Package Manager**: **pnpm** (Always use `pnpm install`, `pnpm run`, etc.)
+
+## 📝 Coding Rules
+- **Formatting**: Use clean, modular components. Avoid "God Components" (Refactor `VaultContentEditor` if needed).
+- **TypeScript**: Always use strict typing. Define interfaces in `src/types`.
+- **Animations**: Use `framer-motion` for smooth, playful transitions (Kip's emotions).
+- **Security**: Never store private keys or sensitive data on the server. Use client-side encryption.
+
+## 🔄 Workflow Rules
+- Always check `traction/CHECKLIST.md` before starting work.
+- Create an `implementation_plan.md` for major changes.
+- Use `task_boundary` to track progress visually.
+- Verify changes using the browser tool and internal dev server (`pnpm dev`).

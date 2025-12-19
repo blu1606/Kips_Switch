@@ -10,6 +10,12 @@ const WalletContextProvider = dynamic(
     { ssr: false }
 );
 
+if (typeof window !== 'undefined') {
+    import('buffer').then(({ Buffer }) => {
+        window.Buffer = window.Buffer || Buffer;
+    });
+}
+
 const Header = dynamic(
     () => import('@/components/layout/Header'),
     { ssr: false }

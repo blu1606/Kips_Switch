@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { useConnection } from '@solana/wallet-adapter-react';
+import { useUnifiedWallet as useWallet } from '@/hooks/useUnifiedWallet';
 import { Program, AnchorProvider, BN, Idl } from '@coral-xyz/anchor';
 import { PROGRAM_ID } from '@/utils/anchor';
 import { parseVaultAccount, VaultData } from '@/utils/solanaParsers';

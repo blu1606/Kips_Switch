@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useUnifiedWallet as useWallet } from '@/hooks/useUnifiedWallet';
 import { AnimatePresence, motion } from 'framer-motion';
 import WalletButton from '@/components/wallet/WalletButton';
 import ClaimedVaultCard from '@/components/archive/ClaimedVaultCard';

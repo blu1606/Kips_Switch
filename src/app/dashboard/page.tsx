@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import { useOwnerVaults, VaultData } from '@/hooks/useVault';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useUnifiedWallet as useWallet } from '@/hooks/useUnifiedWallet';
 import WalletButton from '@/components/wallet/WalletButton';
 import EditVaultModal from '@/components/dashboard/EditVaultModal';
 import DelegateModal from '@/components/dashboard/DelegateModal';

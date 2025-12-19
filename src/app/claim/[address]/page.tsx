@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useUnifiedWallet as useWallet } from '@/hooks/useUnifiedWallet';
 import { useVaultByAddress } from '@/hooks/useVaultByAddress';
 import ClaimModal from '@/components/claim/ClaimModal';
 import WalletButton from '@/components/wallet/WalletButton';

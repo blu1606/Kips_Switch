@@ -33,6 +33,10 @@
 ## 💎 P4: Premium Features
 
 - [ ] **11.3** Key Sharding Demo Improvements (Badge + Real Math) 🛡️ Opus
+- [x] **15.1** Passkey-Native Onboarding (LazorKit) ✅
+- [x] **15.2** Gasless Transactions (Paymaster) ✅
+- [ ] **16.1** Functional Hook Extraction ⚡ Claude
+- [ ] **16.2** UI Component Decomposition 🎨 Gemini
 
 ---
 

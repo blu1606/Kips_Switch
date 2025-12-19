@@ -10,6 +10,7 @@ import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
 import { clusterApiUrl } from '@solana/web3.js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { LazorkitProvider } from '@lazorkit/wallet';
 
 // Import wallet adapter styles
 import '@solana/wallet-adapter-react-ui/styles.css';
@@ -46,13 +47,21 @@ const WalletContextProvider: FC<Props> = ({ children }) => {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <ConnectionProvider endpoint={endpoint}>
-                <WalletProvider wallets={wallets} autoConnect>
-                    <WalletModalProvider>
-                        {children}
-                    </WalletModalProvider>
-                </WalletProvider>
-            </ConnectionProvider>
+            <LazorkitProvider
+                rpcUrl={endpoint}
+                portalUrl="https://portal.lazor.sh"
+                paymasterConfig={{
+                    paymasterUrl: "https://kora.devnet.lazorkit.com"
+                }}
+            >
+                <ConnectionProvider endpoint={endpoint}>
+                    <WalletProvider wallets={wallets} autoConnect>
+                        <WalletModalProvider>
+                            {children}
+                        </WalletModalProvider>
+                    </WalletProvider>
+                </ConnectionProvider>
+            </LazorkitProvider>
         </QueryClientProvider>
     );
 };

@@ -5,13 +5,13 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 const WalletButton = dynamic(() => import('@/components/wallet/WalletButton'), { ssr: false });
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useUnifiedWallet as useUnifiedHook } from '@/hooks/useUnifiedWallet';
 import { MenuBar, NavKey } from '@/components/ui/animated-menu-bar';
 
 export default function Header() {
     const pathname = usePathname();
     const router = useRouter();
-    const { connected } = useWallet();
+    const { connected } = useUnifiedHook();
 
     // Map pathname to nav key
     const getActiveKey = (): NavKey => {

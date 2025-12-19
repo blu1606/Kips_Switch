@@ -2,7 +2,8 @@
 
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { useConnection } from '@solana/wallet-adapter-react';
+import { useUnifiedWallet as useWallet } from '@/hooks/useUnifiedWallet';
 import { motion, AnimatePresence } from 'framer-motion';
 import { unwrapKeyWithPassword, unwrapKeyWithWallet, WrappedKeyData, WalletKeyData, EncryptedData } from '@/utils/crypto';
 import { fetchFromIPFS } from '@/utils/ipfs';
