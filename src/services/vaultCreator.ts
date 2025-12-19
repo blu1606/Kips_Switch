@@ -46,7 +46,7 @@ export async function initializeSolanaVault({
     const program = new Program<DeadmansSwitch>(idl as any, provider);
 
     const tx = await program.methods
-        .initialize_vault(
+        .initializeVault(
             seed,
             cid,
             keyInfo,
@@ -59,7 +59,7 @@ export async function initializeSolanaVault({
         .accounts({
             vault: vaultPda,
             owner: wallet.publicKey,
-            system_program: SystemProgram.programId,
+            systemProgram: SystemProgram.programId,
         })
         .rpc();
 
