@@ -9,6 +9,11 @@
 
 ## 📖 Introduction
 
+github: https://github.com/blu1606/Kips_Switch
+vid demo: https://youtu.be/azx0h-QQDuo
+pitch deck: https://www.canva.com/design/DAG7Z88CdQQ/Y1Rjs9wJpgLayze69L-2_g/view?utm_content=DAG7Z88CdQQ&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h811b0c9d0f
+web:https://kipswitch.vercel.app/
+
 **KipSwitch** turns the gloomy task of "digital inheritance" into a playful, life-affirming habit. 
 
 Instead of a morbid "Deadman's Switch" that you set and forget (until it's too late), KipSwitch gives you **Kip**—a digital guardian that you must "feed" with periodic check-ins. As long as you're active, your secrets remain encrypted and safe. If you stop checking in, Kip assumes something has happened and securely releases your vault to your designated trusted guardians.
